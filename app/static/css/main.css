@@ -3,55 +3,39 @@ body
     background-image: url(../img/vintage-concrete.png)
 }
 
-.container
+.header
 {
     margin: auto;
     background-color:#e1e1d0;
     font-style: italic;
-    width: 1000px;
     text-align: center;
 }
-.logo
-{
-    background-color: black;
-    margin: auto;
-    width: 900px;
-    height: 100px;
+.header .page-logo{
+    float: left;
 }
-.menu
-{
-    margin: auto;
-    background-color: blue;
-    width: 900px;
-    height: 100px;
+.header .page-name{
+    float: left;
 }
-.nav
-{
-    margin-right: -4px;
-    background-color: red;
-    width: 150px;
-    height: 300px;
-    display: inline-block;
+.header .user-data{
+    float: right;
+}
+.navigation{
+    background-color: azure;
+    height: 150px;
+    clear: both;
 }
 .content{
-    margin-right: -4px;
-    display: inline-block;
-    background-color: sandybrown;
-    width: 600px;
-    height: 300px;
-    display: inline-block;
+    background-color: burlywood;
+    float: left;
 }
-.sidebar{
-    display: inline-block;
-    background-color: seagreen;
-    width: 150px;
-    height: 300px;
+.banner{
+    background-color: darkgray;
+    width: 15%;
+    float: right;
+    height: 100%;
 }
 .footer{
-    margin-top: -4px;
-    background-color: darkgoldenrod;
-    width: 900px;
-    height: 200px;
-    margin-right: auto;
-    margin-left: auto
+    background-color: brown;
+    height: 150px;
+    clear: both;
 }
