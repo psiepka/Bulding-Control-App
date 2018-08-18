@@ -1,2 +1,2 @@
-# Get-and-order-app
-This is app, where we can order some material and control status of our purchase.
+# Building-Control-App
+With this app we can easy control and in faster way store raports and documentation.
