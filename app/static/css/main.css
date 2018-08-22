@@ -1,31 +1,58 @@
 body
 {
-    background-image: url(../img/vintage-concrete.png)
+    background-image: url(../img/vintage-concrete.png);
+    font-family: 'Lato', sans-serif;
 }
-
+.option a{
+    color: #c0c0c0
+}
 .header
 {
     margin: auto;
     background-color:#e1e1d0;
-    font-style: italic;
     text-align: center;
 }
 .header .page-logo{
     float: left;
 }
 .header .page-name{
+    font-weight: 900;
+    font-size: 44px;
     float: left;
 }
 .header .user-data{
     float: right;
 }
 .navigation{
-    background-color: azure;
-    height: 150px;
-    clear: both;
+    background-color: #312f2f;
+    margin-top: 20px;
+    color: #ffffff;
+    padding: 10px
+}
+.navigation .option{
+    float: left;
+    min-width: 50px;
+    font-size: 18px;
+    height: 25px;
+    padding: 10px;
+    border-right: 2px dotted #fffff1;
+    opacity: 0.8;
+}
+.navigation .option:hover{
+    background-color: #000000;
+    cursor: context-menu
+}
+.navigation .option:visited{
+    background-color: #000000;
+    cursor: context-menu;
+}
+.navigation .option:active{
+    background-color: #000000;
+    cursor: context-menu;
+    color: white;
 }
 .content{
-    background-color: burlywood;
+    background-color: blanchedalmond;
     float: left;
 }
 .banner{

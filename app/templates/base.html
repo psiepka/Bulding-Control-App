@@ -7,6 +7,7 @@
     <title>{{title}} - BudApp</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="../static/css/main.css" />
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,900&amp;subset=latin-ext" rel="stylesheet">
 </head>
 <body>
     <div class="header">
@@ -19,16 +20,23 @@
             Log or join us!
             {% endif %}
         </div>
+        <div style="clear: both;"></div>
     </div>
     <div class="navigation">
-        <div class="menu">
-            <ul>
-                <li>Strona Główna</li>
-                <li>Obserwowani</li>
-                <li>Inne</li>
-            </ul>
-        </div>
+        <div class="option"><a href="{{ url_for('index') }}">Strona Główna</a></a></div>
+        <div class="option"><a href="{{ url_for('login') }}">Logowanie</a></div>
+        <div style="clear:both"></div>
+    </div>
     <div class='content'>
+        {% with messeges = get_flashed_messages() %}
+        {% if messeges %}
+        <ul>
+            {% for messege in messeges %}
+            <li>{{ messege }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </div>
     <div class='banner'>
