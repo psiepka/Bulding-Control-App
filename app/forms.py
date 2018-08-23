@@ -10,7 +10,7 @@ class RegistrationForm(FlaskForm):
     nickname = StringField('Nickname', validators=[DataRequired()])
     name = StringField('Name', validators=[DataRequired()])
     surname = StringField('Surname', validators=[DataRequired()])
-    position = RadioField('Position', validators=[DataRequired()], choices=[('value','build'), ('value_2','office')])
+    position = RadioField('Position', validators=[DataRequired()], choices=[('B','build'), ('O','office')])
     email = StringField('Email', validators=[DataRequired(),'Email'])
     phone = IntegerField('Phone number', validators=[DataRequired()])
     submit = SubmitField('Register in')
