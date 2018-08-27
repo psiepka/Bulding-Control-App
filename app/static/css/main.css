@@ -1,7 +1,10 @@
 body
 {
+    height: 100%;
+    position:relative;
     background-image: url(../img/vintage-concrete.png);
     font-family: 'Lato', sans-serif;
+    min-height:100%
 }
 .option a{
     color: #c0c0c0
@@ -16,12 +19,18 @@ body
     float: left;
 }
 .header .page-name{
+    font-family: 'Indie Flower', cursive;
     font-weight: 900;
     font-size: 44px;
+    text-align: left;
+    padding: 10px;
     float: left;
 }
 .header .user-data{
+    margin-top: 20px;
+    font-size: 18px;
     float: right;
+    text-align: right;
 }
 .navigation{
     background-color: #312f2f;
@@ -54,6 +63,8 @@ body
 .content{
     background-color: blanchedalmond;
     float: left;
+    padding: 20px;
+    padding-bottom:60px;
 }
 .banner{
     background-color: darkgray;
@@ -62,7 +73,19 @@ body
     height: 100%;
 }
 .footer{
-    background-color: brown;
-    height: 150px;
     clear: both;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #d8d3d3;
+    color: #2b2828;
+    text-align: center;
+}
+a.icons{
+    color: #362828;
+    text-decoration: none
+}
+a.icons:hover{
+    color: #0c0b0b
 }

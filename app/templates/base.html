@@ -7,15 +7,17 @@
     <title>{{title}} - BudApp</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="../static/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="../static/css/fontello.css" />
     <link href="https://fonts.googleapis.com/css?family=Lato:400,900&amp;subset=latin-ext" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
 </head>
 <body>
     <div class="header">
-        <div class="page-logo"><img src="../static/img/logo.jpg" alt="Logo_strony" width="100" height="100"></div>
+        <div class="page-logo"><i class='icon-hammer'></i></div>
         <div class="page-name">Building Media</div>
         <div class="user-data">
             {% if user %}
-            {{ user.username }}
+            <i class="icon-user"></i>{{ user.username }}
             {% else %}
             Log or join us!
             {% endif %}
@@ -43,7 +45,10 @@
         REKLAMA
     </div>
     <div class='footer'>
-        Wykonano przez P.Siepka
+        Wykonano przez Patryka Siepke
+        <a class='icons' href="https://github.com/psiepka" target="_blank"><i class='icon-github'></i></a>
+        <a class='icons' href="https://www.linkedin.com/in/patryksiepka/" target="_blank"><i class='icon-linkedin-squared'></i></a>
+        <a class='icons' href="https://www.facebook.com/patryk.siepka" target="_blank"><i class='icon-facebook-squared'></i></a>
     </div>
 </body>
 </html>
