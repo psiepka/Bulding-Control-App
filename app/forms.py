@@ -1,19 +1,33 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, RadioField, IntegerField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, Email
+from wtforms import StringField, RadioField, IntegerField, PasswordField, BooleanField, SubmitField, PasswordField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+from app.models import User
 
 
 class RegistrationForm(FlaskForm):
     '''
-    This is registraton form where we must type our nickname, name, surname, 
+    This is registraton form where we must type our nickname, name, surname
     '''
     nickname = StringField('Nickname', validators=[DataRequired()])
     name = StringField('Name', validators=[DataRequired()])
     surname = StringField('Surname', validators=[DataRequired()])
     position = RadioField('Position', validators=[DataRequired()], choices=[('B','build'), ('O','office')])
-    email = StringField('Email', validators=[DataRequired(),'Email'])
-    phone = IntegerField('Phone number', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(),])
+    repeat_password = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    email = StringField('Email', validators=[DataRequired(),Email() ])
+    phone = StringField('Phone number', validators=[DataRequired()])
     submit = SubmitField('Register in')
+
+    def validate_nickname(self, nickname):
+        user = User.query.filter_by(nickname=nickname.data).first()
+        if user is not None:
+            raise ValidationError('Please use a different username.')
+
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user is not None:
+            raise ValidationError('Please use a different username.')
 
 
 class LoginForm(FlaskForm):

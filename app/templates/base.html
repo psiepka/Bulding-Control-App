@@ -16,10 +16,11 @@
         <div class="page-logo"><i class='icon-hammer'></i></div>
         <div class="page-name">Building Media</div>
         <div class="user-data">
-            {% if user %}
-            <i class="icon-user"></i>{{ user.username }}
+            {% if current_user.is_active %}
+            <i class="icon-user"></i>{{ current_user.name }} {{ current_user.surname }} <br>
+            <a href="{{ url_for('logout') }}">Logout</a>
             {% else %}
-            Log or join us!
+            <a href="{{ url_for('login') }}">Log or join us!</a>
             {% endif %}
         </div>
         <div style="clear: both;"></div>

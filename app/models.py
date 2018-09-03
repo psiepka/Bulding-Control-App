@@ -1,14 +1,17 @@
 from datetime import datetime
-from app import db
+from werkzeug.security import check_password_hash, generate_password_hash
+from flask_login import UserMixin
+from app import db, login_manager
 
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     """database for users in website
     Arguments:
         db id -- invidiual uniq id of user
     """
     id = db.Column(db.Integer, primary_key=True)
+    nickname = db.Column(db.String(40), nullable=False)
     name = db.Column(db.String(40), nullable=False)
     surname = db.Column(db.String(40), nullable=False)
     position = db.Column(db.String(20), nullable=False)
@@ -19,6 +22,19 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User {} {}>'.format(self.name, self.surname)
+
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 class Post(db.Model):
     """post model database
