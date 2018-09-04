@@ -2,7 +2,8 @@ from app import app, db
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_required, login_user, current_user, logout_user
 from werkzeug.urls import url_parse
-from app.forms import LoginForm, RegistrationForm
+from datetime import datetime
+from app.forms import LoginForm, RegistrationForm, EditProfileForm
 from app.models import User, Post
 
 
@@ -31,7 +32,9 @@ def login():
     return render_template('login.html', form=form, title='Log in' )
 
 
+
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
@@ -52,3 +55,35 @@ def registration():
     return render_template('registration.html', form=form, title='Register in ')
 
 
+@login_required
+@app.route('/user/<nickname>')
+def profile(nickname):
+    user = User.query.filter_by(nickname=nickname).first_or_404()
+    return render_template('profile.html', user=user)
+
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
+
+
+@login_required
+@app.route('/edit_profile', methods=['GET','POST'])
+def edit_profile():
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        current_user.nickname = form.nickname.data
+        current_user.description = form.description.data
+        current_user.phone = form.phone.data
+        current_user.position = form.position.data
+        db.session.commit()
+        flash('You changes are save on profile')
+        return redirect(url_for('edit_profile'))
+    elif request.method == 'GET':
+        form.nickname.data = current_user.nickname
+        form.position.data = current_user.position
+        form.description.data = current_user.description
+        form.phone.data = current_user.phone
+        return render_template('edit_profile.html', form=form)

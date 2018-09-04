@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Edit Profile</h1>
+
+<form action="" method="POST" novalidate>
+    {{ form.hidden_tag() }}
+    <p>{{ form.nickname.label }}</p>
+    <p>{{ form.nickname(size=32) }}</p>
+    {% for error in form.nickname.errors %}
+    <span style='color: red;'>[{{ error }}]</span>
+    {% endfor %}
+    <p>{{ form.phone.label }}</p>
+    <p>{{ form.phone(size=32) }}</p>
+    {% for error in form.phone.errors %}
+    <span style='color:red;'>[{{ error }}]</span>
+    {% endfor %}
+    </p>
+    <p>{{ form.position.label }}</p>
+    <p>{{ form.position }} </p>
+    {% for error in form.position.errors %}
+    <span style='color: red;'>[{{ error }}]</span>
+    {% endfor %}
+    <p>{{ form.description.label }} </p>
+    <p>{{ form.description(cols=50, rows=4)  }}</p>
+    {% for error in form.description.errors %}
+    <span style='color:red;'>[{{ error }}]</span>
+    {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
+
+{% endblock %}

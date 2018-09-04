@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
@@ -18,6 +19,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), nullable=False)
     password_hash = db.Column(db.String(128))
     phone = db.Column(db.Integer)
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    description = db.Column(db.Text)
     posts = db.relationship('Post', backref='author', lazy='dynamic')
 
     def __repr__(self):
@@ -32,9 +35,17 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
 
+    def avatar(self):
+        if self.position == 'B':
+            return os.path.join('..','static', 'img','budowa.jpg')
+        else:
+            return os.path.join('..','static', 'img','biuro.jpg')
+
+
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
 
 class Post(db.Model):
     """post model database

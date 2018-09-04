@@ -17,7 +17,7 @@
         <div class="page-name">Building Media</div>
         <div class="user-data">
             {% if current_user.is_active %}
-            <i class="icon-user"></i>{{ current_user.name }} {{ current_user.surname }} <br>
+            <a href="{{ url_for('profile', nickname=current_user.nickname) }}"> <i class="icon-user"></i>{{ current_user.name }} {{ current_user.surname }}</a>  <br>
             <a href="{{ url_for('logout') }}">Logout</a>
             {% else %}
             <a href="{{ url_for('login') }}">Log or join us!</a>

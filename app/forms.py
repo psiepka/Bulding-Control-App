@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, RadioField, IntegerField, PasswordField, BooleanField, SubmitField, PasswordField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+from wtforms import StringField, RadioField, IntegerField, PasswordField, BooleanField, SubmitField, PasswordField, TextAreaField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length, NumberRange
 from app.models import User
 
 
@@ -38,3 +38,15 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remeber_me = BooleanField('Remeber me')
     submit = SubmitField('Log in')
+
+
+class EditProfileForm(FlaskForm):
+    """
+    Arguments:
+        FlaskForm edit profile  -- type som thing about you, you can change you position, phone number, nickname
+    """
+    nickname = StringField('Nickname', validators=[DataRequired()])
+    description = TextAreaField('About me', validators=[Length(min=0, max=200)])
+    phone = IntegerField('Phone number', validators=[NumberRange(min=0, max=10)])
+    position = RadioField('Position', validators=[DataRequired()], choices=[('B','build'), ('O','office')])
+    submit = SubmitField('Submit')
