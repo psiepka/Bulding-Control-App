@@ -47,6 +47,16 @@ class EditProfileForm(FlaskForm):
     """
     nickname = StringField('Nickname', validators=[DataRequired()])
     description = TextAreaField('About me', validators=[Length(min=0, max=200)])
-    phone = IntegerField('Phone number', validators=[NumberRange(min=0, max=10)])
+    phone = IntegerField('Phone number', validators=[DataRequired()])
     position = RadioField('Position', validators=[DataRequired()], choices=[('B','build'), ('O','office')])
     submit = SubmitField('Submit')
+
+    def __init__(self, orginal_name, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        self.orginal_name = orginal_name
+
+    def validate_nickname(self, nickname):
+        if nickname.data != self.orginal_name:
+            user = User.query.filter_by(nickname=nickname.data).first()
+            if user is not None:
+                raise ValidationError('Please use a different username.')

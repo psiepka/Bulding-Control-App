@@ -59,7 +59,7 @@ def registration():
 @app.route('/user/<nickname>')
 def profile(nickname):
     user = User.query.filter_by(nickname=nickname).first_or_404()
-    return render_template('profile.html', user=user)
+    return render_template('profile.html', user=user, title=nickname+' profile')
 
 
 @app.before_request
@@ -72,7 +72,7 @@ def before_request():
 @login_required
 @app.route('/edit_profile', methods=['GET','POST'])
 def edit_profile():
-    form = EditProfileForm()
+    form = EditProfileForm(current_user.nickname)
     if form.validate_on_submit():
         current_user.nickname = form.nickname.data
         current_user.description = form.description.data
@@ -80,10 +80,10 @@ def edit_profile():
         current_user.position = form.position.data
         db.session.commit()
         flash('You changes are save on profile')
-        return redirect(url_for('edit_profile'))
+        return redirect(url_for('profile',nickname=current_user.nickname))
     elif request.method == 'GET':
         form.nickname.data = current_user.nickname
         form.position.data = current_user.position
         form.description.data = current_user.description
         form.phone.data = current_user.phone
-        return render_template('edit_profile.html', form=form)
+    return render_template('edit_profile.html', form=form, title='Edit profile')
