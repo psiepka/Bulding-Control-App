@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>BLOG:</h1>
+{% if current_user.is_authenticated %}
+<button><a href="{{url_for('add_post')}}">ADD POST</a></button>
+{% endif %}
+<br>
+{% for post in posts %}
+<table border="1">
+    <tr>
+        <td>{{post.author.name}} {{post.author.surname}} : </td>
+        <td>{{post.body}}</td>
+    </tr>
+</table>
+{% endfor %}
+
+{% endblock %}

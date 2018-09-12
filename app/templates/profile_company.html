@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<table>
+    <tr>
+        <th colspan="2"><h1>{{company.name }}</h1></th>
+    </tr>
+    <tr>
+        <td>Description : </td>
+        <td>{{ company.description }}</td>
+    </tr>
+    <tr> 
+        <td>Web page : </td>
+        <td><a href="{{company.web_page}}" target="_blank"> {{ company.web_page }} </a></td>
+    </tr>
+    <tr>
+        <td>Employees :</td>
+        <td><a href="{{ url_for('employees',company_id=company.id) }}">List of employees({{ company.number_workers() }})</a></td>
+    </tr>
+</table>
+
+{% endblock %}

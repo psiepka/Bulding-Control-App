@@ -3,14 +3,21 @@ from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_required, login_user, current_user, logout_user
 from werkzeug.urls import url_parse
 from datetime import datetime
-from app.forms import LoginForm, RegistrationForm, EditProfileForm
-from app.models import User, Post
+from app.forms import LoginForm, PostForm, RegistrationForm, EditProfileForm, CompanyForm, BuildForm
+from app.models import User, Post, Company, Build
+
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
 
 
 @app.route('/')
+@app.route('/index')
 def index():
-    user = {'username':'Patryk'}
-    return render_template('index.html', user=user, title='HomePage')
+    return render_template('index.html', title='HomePage')
 
 
 @app.route('/login', methods=['GET','POST'])
@@ -46,7 +53,8 @@ def registration():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(nickname=form.nickname.data, name=form.name.data, surname=form.surname.data, phone=form.phone.data, position=form.position.data, email = form.email.data)
+        user = User(nickname=form.nickname.data, name=form.name.data, surname=form.surname.data,
+                    phone=form.phone.data, position=form.position.data, email = form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -55,22 +63,15 @@ def registration():
     return render_template('registration.html', form=form, title='Register in ')
 
 
-@login_required
 @app.route('/user/<nickname>')
+@login_required
 def profile(nickname):
     user = User.query.filter_by(nickname=nickname).first_or_404()
-    return render_template('profile.html', user=user, title=nickname+' profile')
+    return render_template('profile_user.html', user=user, title=nickname+' profile')
 
 
-@app.before_request
-def before_request():
-    if current_user.is_authenticated:
-        current_user.last_seen = datetime.utcnow()
-        db.session.commit()
-
-
-@login_required
 @app.route('/edit_profile', methods=['GET','POST'])
+@login_required
 def edit_profile():
     form = EditProfileForm(current_user.nickname)
     if form.validate_on_submit():
@@ -87,3 +88,105 @@ def edit_profile():
         form.description.data = current_user.description
         form.phone.data = current_user.phone
     return render_template('edit_profile.html', form=form, title='Edit profile')
+
+
+@app.route('/builds')
+@login_required
+def builds():
+    builds = Build.query.all()
+    b = [
+        {
+            'name':'DROGA KONIN',
+            'specification':'Odcinek 15 km, wymiana rur metr od drogi, wyminan nawierzchni',
+            'worth':10000,
+            'place':'Konin',
+            'contractor':{'name':'Kogucik'}
+        },
+        {
+            'name':'Koleje Poz-War',
+            'specification':'Odcinek w chuj dlugi, częściowo do wymiany tory, niektóre mosty odnowione',
+            'worth':5000000000,
+            'place':'Poznan, Konin, Kutno, Warszawa',
+            'contractor':{'name':'TORPOL'}
+        }
+    ]
+    return render_template('builds.html', builds=builds, title='All builds')
+
+
+@app.route('/companies')
+@login_required
+def companies():
+    comp = [
+        {
+            'name':'STRABAG',
+            'description':'mosty, drogi, koleje'
+        },
+        {
+            'name':'TORPOL',
+            'description':' KOoleje'
+        }
+    ]
+    companies = Company.query.all()
+    return render_template('companies.html', companies=companies, title='Companies')
+
+
+@login_required
+@app.route('/companies/add', methods=['GET','POST'])
+def add_company():
+    form = CompanyForm()
+    if form.validate_on_submit():
+        company = Company(name=form.name.data, description=form.description.data,
+                            web_page=form.web_page.data)
+        db.session.add(company)
+        db.session.commit()
+        flash('Congratulation you create company!')
+        return redirect(url_for('companies'))
+    return render_template('add_company.html', form=form, title='Create Company')
+
+
+@login_required
+@app.route('/companies/<int:company_id>')
+def profile_company(company_id):
+    company = Company.query.filter_by(id=company_id).first_or_404()
+    return render_template('profile_company.html', company=company, title=company.name+' profile')
+
+
+@login_required
+@app.route('/companies/<int:company_id>/employees')
+def employees(company_id):
+    company = Company.query.filter_by(id=company_id).first_or_404()
+    return render_template('employees.html', company=company, title=company.name+' employees')
+
+
+@login_required
+@app.route('/builds/add', methods=['GET','POST'])
+def add_build():
+    form = BuildForm()
+    if form.validate_on_submit():
+        build = Build(name=form.name.data, specification=form.specification.data,
+                        category=form.category.data, worth=form.worth.data, place=form.place.data,
+                        creater=current_user)
+        db.session.add(build)
+        db.session.commit()
+        flash('Congratulation you create your own build!')
+        return redirect(url_for('builds'))
+    return render_template('add_build.html', form=form, title='Create Build')
+
+
+@app.route('/blog')
+def blog():
+    posts = Post.query.all()
+    return render_template('blog.html',posts=posts, title='MicroBlog')
+
+
+@login_required
+@app.route('/blog/add', methods=['GET','POST'])
+def add_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(body=form.body.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('You post is now avaible ')
+        return redirect(url_for('blog'))
+    return render_template('add_post.html', form=form, title='Add post')

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, RadioField, IntegerField, PasswordField, BooleanField, SubmitField, PasswordField, TextAreaField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length, NumberRange
-from app.models import User
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length, NumberRange, URL
+from app.models import User, Company, Build
 
 
 class RegistrationForm(FlaskForm):
@@ -12,7 +12,7 @@ class RegistrationForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     surname = StringField('Surname', validators=[DataRequired()])
     position = RadioField('Position', validators=[DataRequired()], choices=[('B','build'), ('O','office')])
-    password = PasswordField('Password', validators=[DataRequired(),])
+    password = PasswordField('Password', validators=[DataRequired(),Length(8,message='At least 8 characters.')])
     repeat_password = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
     email = StringField('Email', validators=[DataRequired(),Email() ])
     phone = StringField('Phone number', validators=[DataRequired()])
@@ -27,8 +27,23 @@ class RegistrationForm(FlaskForm):
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
-            raise ValidationError('Please use a different username.')
+            raise ValidationError('Please use a different email.')
 
+
+    def validate_password(self, password):
+        p = password.data
+        n = 0
+        u = 0
+        l = 0
+        for i in p:
+            if i.islower():
+                l += 1
+            if i.isupper():
+                u += 1
+            if i.isdigit():
+                n += 1
+        if n == 0 or u == 0 or l == 0:
+            raise ValidationError('Password must contain one digit, one lowercase letter one uppercase letter.')
 
 class LoginForm(FlaskForm):
     """
@@ -59,4 +74,51 @@ class EditProfileForm(FlaskForm):
         if nickname.data != self.orginal_name:
             user = User.query.filter_by(nickname=nickname.data).first()
             if user is not None:
-                raise ValidationError('Please use a different username.')
+                raise ValidationError('Please use a different nickname.')
+
+
+class CompanyForm(FlaskForm):
+    """
+    company adding form
+    """
+    name = StringField('Name', validators=[DataRequired()])
+    description = TextAreaField('Company description', validators=[Length(min=0, max=1000)])
+    web_page = StringField('Web page *')
+    submit = SubmitField('Submit')
+
+    def validate_name(self, name):
+        name = Company.query.filter_by(name=name.data).first()
+        if name is not None:
+            raise ValidationError('Please use a different name of your Company.')
+
+    def validate_web_page(self, web_page):
+        web = Company.query.filter_by(web_page=web_page.data).first()
+        if web is not None:
+            raise ValidationError('For this web page company already exist.')
+
+
+class BuildForm(FlaskForm):
+    """
+    Build addding form
+    Arguments:
+    name - String, specification String, worth Integer, place String(place on map), start_date, end_date, creator_id, contractor_id
+    """
+    name = StringField('Name', validators=[DataRequired()])
+    specification = StringField('Specification', validators=[DataRequired()])
+    category = StringField('Category', validators=[DataRequired()])
+    worth = IntegerField('Value', validators=[DataRequired()])
+    place = StringField('Place', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+    def validate_name(self, name):
+        name = Build.query.filter_by(name=name.data).first()
+        if name is not None:
+            raise ValidationError('Please use a different name of Building.')
+
+
+class PostForm(FlaskForm):
+    """
+    Post adding form
+    """
+    body = TextAreaField('Post', validators=[DataRequired(), Length(1,2000)])
+    submit = SubmitField('Submit')

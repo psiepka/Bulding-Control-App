@@ -1,7 +1,8 @@
 import os
 from datetime import datetime
-from sqlalchemy import Column, Table
-from sqlalchemy.types import Integer, String, Text, DateTime
+from sqlalchemy import Column, Table, ForeignKey
+from sqlalchemy.types import Integer, String, Text, DateTime, Boolean
+from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 from app import db, login_manager
@@ -23,8 +24,9 @@ class User(UserMixin, db.Model):
     phone = Column(Integer)
     last_seen = Column(DateTime, default=datetime.utcnow)
     description = Column(Text)
-    posts = db.relationship('Post', backref='author', lazy='dynamic')
-    company_id = Column(Integer, db.ForeignKey('company.id'))
+    posts = relationship('Post', backref='author', lazy='dynamic')
+    company_id = Column(Integer, ForeignKey('company.id'))
+    creatures = relationship('Build', backref='creater', lazy='dynamic')
 
     def __repr__(self):
         return '<User {} {}>'.format(self.name, self.surname)
@@ -55,7 +57,7 @@ class Post(db.Model):
     id = Column(Integer, primary_key=True)
     body = Column(String(200), nullable=False)
     timestamp = Column(DateTime, index=True, default=datetime.utcnow)
-    user_id = Column(Integer, db.ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey('user.id'))
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
@@ -68,9 +70,10 @@ class Company(db.Model):
     """
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False, unique=True)
-    description = Column(String(300))
-    workers = db.relationship('User', backref='company', lazy='dynamic')
-    builds = db.relationship('Build', backref='contractor', lazy='dynamic')
+    description = Column(String(1000))
+    web_page = Column(String(100), unique=True)
+    workers = relationship('User', backref='company', lazy='dynamic')
+    builds = relationship('Build', backref='contractor', lazy='dynamic')
 
     def hire(self, user):
         if not user in self.workers:
@@ -80,7 +83,7 @@ class Company(db.Model):
         if user in self.workers:
             self.workers.remove(user)
 
-    def number_workers(self, user):
+    def number_workers(self):
         return self.workers.count()
 
     def add_build(self, building):
@@ -99,5 +102,11 @@ class Build(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False, unique=True)
     specification = Column(String(2000), nullable=False)
+    category = Column(String(200), nullable=False)
     worth = Column(Integer, nullable=False)
-    contractor_id = Column(Integer, db.ForeignKey('company.id'))
+    place = Column(String(200), nullable=False)
+    start_date = Column(DateTime)
+    end_date = Column(DateTime)
+    verified = Column(Boolean, default=False)
+    creater_id = Column(Integer, ForeignKey('user.id'))
+    contractor_id = Column(Integer, ForeignKey('company.id'))
