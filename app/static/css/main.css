@@ -33,12 +33,14 @@ body
     text-align: right;
 }
 .navigation{
+    text-align: center;
     background-color: #312f2f;
     margin-top: 20px;
     color: #ffffff;
     padding: 10px
 }
 .navigation .option{
+    text-align: center;
     float: left;
     min-width: 50px;
     font-size: 18px;

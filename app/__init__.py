@@ -1,11 +1,13 @@
 import logging
 import os
 from logging.handlers import SMTPHandler, RotatingFileHandler
-from flask import Flask
-from config import Config
+from flask import Flask, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
+from flask_admin import Admin, AdminIndexView
+from config import Config
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -16,6 +18,16 @@ login_manager.login_view = 'login'
 login_manager.login_message = u'Dudee, you must SIGN IN to acess this page.'
 login_manager.login_message_category = 'info'
 
+
+class MyAdminIndexView(AdminIndexView):
+    def is_accessible(self):
+        if current_user.is_authenticated:
+            return current_user.admin
+        else:
+            return False
+
+
+admin = Admin(app, name='microapp', index_view=MyAdminIndexView(), template_mode='bootstrap3')
 
 if not app.debug:
     if app.config['MAIL_SERVER']:
@@ -40,10 +52,8 @@ if not app.debug:
         '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
-
     app.logger.setLevel(logging.INFO)
     app.logger.info('Microblog startup')
-
 
 
 from app import routes, models, errors

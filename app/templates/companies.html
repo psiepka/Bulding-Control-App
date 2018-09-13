@@ -6,8 +6,12 @@
 <br>
 <button><a href="{{url_for('add_company')}}">Add company</a></button>
 <br>
-{% for company in companies %}
-<b><a href="{{ url_for('profile_company',company_id=company.id) }}">{{ company.name }} </a></b> <em>  {{ company.description }}</em>
-<hr>
-{% endfor %}
+<table>
+    {% for company in companies %}
+    <tr>
+        <td> <b><a href="{{ url_for('profile_company',company_id=company.id) }}">{{ company.name }} </a></b> </td>
+        <td> <em>  {{ company.description }}</em></td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}

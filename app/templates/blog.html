@@ -6,13 +6,12 @@
 <button><a href="{{url_for('add_post')}}">ADD POST</a></button>
 {% endif %}
 <br>
-{% for post in posts %}
 <table border="1">
+{% for post in posts %}
     <tr>
-        <td>{{post.author.name}} {{post.author.surname}} : </td>
+        <td> <a href="{{url_for('profile_user',nickname=post.author.nickname) }}">{{post.author.name}} {{post.author.surname}} </a>: </td>
         <td>{{post.body}}</td>
     </tr>
-</table>
 {% endfor %}
-
+</table>
 {% endblock %}

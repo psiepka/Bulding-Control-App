@@ -5,7 +5,8 @@ from sqlalchemy.types import Integer, String, Text, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
-from app import db, login_manager
+from flask_admin.contrib.sqla import ModelView
+from app import db, login_manager, admin
 
 
 
@@ -24,6 +25,7 @@ class User(UserMixin, db.Model):
     phone = Column(Integer)
     last_seen = Column(DateTime, default=datetime.utcnow)
     description = Column(Text)
+    admin = Column(Boolean, default=False)
     posts = relationship('Post', backref='author', lazy='dynamic')
     company_id = Column(Integer, ForeignKey('company.id'))
     creatures = relationship('Build', backref='creater', lazy='dynamic')
@@ -110,3 +112,9 @@ class Build(db.Model):
     verified = Column(Boolean, default=False)
     creater_id = Column(Integer, ForeignKey('user.id'))
     contractor_id = Column(Integer, ForeignKey('company.id'))
+
+
+admin.add_view(ModelView(User, db.session))
+admin.add_view(ModelView(Post, db.session))
+admin.add_view(ModelView(Build, db.session))
+admin.add_view(ModelView(Company, db.session))

@@ -7,8 +7,12 @@ All register in app builds.
 <br>
 <button><a href="{{url_for('add_build')}}">Add build</a></button>
 <br>
-{% for build in builds %}
-<b>{{ build.name }}</b> {{ build.specification }} {{ build.category }} {{ build.worth}} <em> by {{build.creater.name}}</em>
-<hr>
-{% endfor %}
+<table>
+    {% for build in builds %}
+    <tr>
+        <td> <a href="{{ url_for('profile_build', build_id=build.id) }}"><b> {{ build.name }} </b></a> </td>
+        <td> {{ build.category }} </td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}

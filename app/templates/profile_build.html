@@ -4,25 +4,44 @@
 
 <table>
     <tr>
-        <th> <img src="{{ user.avatar() }}" alt="avatar" width="100"></th>
-        <th><h1>{{user.name }} {{user.surname }}</h1></th>
+        <th colspan="2"> {{build.name }} </th>
     </tr>
-    {% if user.last_seen %}
     <tr>
-        <td>Active : </td>
-        <td>{{ user.last_seen.strftime('%d %B %Y - %H:%M:%S') }}</td>
+        <td>Specification : </td>
+        <td>{{ build.specification }}</td>
+    </tr>
+    <tr>
+        <td>Category of build : </td>
+        <td>{{ build.category }}</td>
+    </tr>
+    <tr>
+        <td>Build is worth : </td>
+        <td>{{ build.worth }} zł </td>
+    </tr>
+    <tr>
+        <td>Localization of build : </td>
+        <td> {{ build.place }} </td>
+    </tr>
+    {% if build.start_date %}
+    <tr>
+        <td> Plannig start of build </td>
+        <td> {{ build.start_date }} </td>
     </tr>
     {% endif %}
-    {% if user.description %}
+    {% if build.end_date %}
     <tr>
-        <td>Self description : </td>
-        <td>{{ user.description }}</td>
+        <td> Plannig end of build </td>
+        <td> {{ build.end_date }} </td>
+    </tr>
+    {% endif %}
+    <tr>
+        <td colspan="2"> Created by <a href="{{ url_for('profile_user', nickname=build.creater.nickname) }}">  <strong>{{build.creater.nickname}}</strong> </a></td>
+    </tr>
+    {% if build.contractor_id %}
+    <tr>
+        <td colspan="2"> Contract is executed by <a href="{{ url_for('profile_company',company_id=build.contractor.id) }}">{{ build.contractor.name }} </a></td>
     </tr>
     {% endif %}
 </table>
-{% if user == current_user %}
-
-<button><a  href="{{url_for('edit_profile')}}">Edit profile</a> </button>
-{% endif %}
 
 {% endblock %}

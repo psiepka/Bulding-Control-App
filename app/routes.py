@@ -65,7 +65,7 @@ def registration():
 
 @app.route('/user/<nickname>')
 @login_required
-def profile(nickname):
+def profile_user(nickname):
     user = User.query.filter_by(nickname=nickname).first_or_404()
     return render_template('profile_user.html', user=user, title=nickname+' profile')
 
@@ -81,36 +81,13 @@ def edit_profile():
         current_user.position = form.position.data
         db.session.commit()
         flash('You changes are save on profile')
-        return redirect(url_for('profile',nickname=current_user.nickname))
+        return redirect(url_for('profile_user',nickname=current_user.nickname))
     elif request.method == 'GET':
         form.nickname.data = current_user.nickname
         form.position.data = current_user.position
         form.description.data = current_user.description
         form.phone.data = current_user.phone
     return render_template('edit_profile.html', form=form, title='Edit profile')
-
-
-@app.route('/builds')
-@login_required
-def builds():
-    builds = Build.query.all()
-    b = [
-        {
-            'name':'DROGA KONIN',
-            'specification':'Odcinek 15 km, wymiana rur metr od drogi, wyminan nawierzchni',
-            'worth':10000,
-            'place':'Konin',
-            'contractor':{'name':'Kogucik'}
-        },
-        {
-            'name':'Koleje Poz-War',
-            'specification':'Odcinek w chuj dlugi, częściowo do wymiany tory, niektóre mosty odnowione',
-            'worth':5000000000,
-            'place':'Poznan, Konin, Kutno, Warszawa',
-            'contractor':{'name':'TORPOL'}
-        }
-    ]
-    return render_template('builds.html', builds=builds, title='All builds')
 
 
 @app.route('/companies')
@@ -157,6 +134,28 @@ def employees(company_id):
     company = Company.query.filter_by(id=company_id).first_or_404()
     return render_template('employees.html', company=company, title=company.name+' employees')
 
+@app.route('/builds')
+@login_required
+def builds():
+    builds = Build.query.all()
+    b = [
+        {
+            'name':'DROGA KONIN',
+            'specification':'Odcinek 15 km, wymiana rur metr od drogi, wyminan nawierzchni',
+            'worth':10000,
+            'place':'Konin',
+            'contractor':{'name':'Kogucik'}
+        },
+        {
+            'name':'Koleje Poz-War',
+            'specification':'Odcinek w chuj dlugi, częściowo do wymiany tory, niektóre mosty odnowione',
+            'worth':5000000000,
+            'place':'Poznan, Konin, Kutno, Warszawa',
+            'contractor':{'name':'TORPOL'}
+        }
+    ]
+    return render_template('builds.html', builds=builds, title='All builds')
+
 
 @login_required
 @app.route('/builds/add', methods=['GET','POST'])
@@ -171,6 +170,13 @@ def add_build():
         flash('Congratulation you create your own build!')
         return redirect(url_for('builds'))
     return render_template('add_build.html', form=form, title='Create Build')
+
+
+@login_required
+@app.route('/builds/<int:build_id>')
+def profile_build(build_id):
+    build = Build.query.filter_by(id=build_id).first_or_404()
+    return render_template('profile_build.html', build=build, title=build.name)
 
 
 @app.route('/blog')
