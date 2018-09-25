@@ -19,10 +19,11 @@
         <td>{{ user.description }}</td>
     </tr>
     {% endif %}
+    {% if user == current_user %}
+    <tr>
+        <td colspan="2"><button><a  href="{{url_for('edit_profile')}}">Edit profile</a> </button></td>
+    </tr>
+    {% endif %}
 </table>
-{% if user == current_user %}
-
-<button><a  href="{{url_for('edit_profile')}}">Edit profile</a> </button>
-{% endif %}
 
 {% endblock %}

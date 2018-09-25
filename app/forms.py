@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, RadioField, IntegerField, PasswordField, BooleanField, SubmitField, PasswordField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length, NumberRange, URL
+import requests
 from app.models import User, Company, Build
 
 
@@ -11,7 +12,7 @@ class RegistrationForm(FlaskForm):
     nickname = StringField('Nickname', validators=[DataRequired()])
     name = StringField('Name', validators=[DataRequired()])
     surname = StringField('Surname', validators=[DataRequired()])
-    position = RadioField('Position', validators=[DataRequired()], choices=[('B','build'), ('O','office')])
+    gender = RadioField('Gender', validators=[DataRequired()], choices=[('male','Male'), ('female','Female')])
     password = PasswordField('Password', validators=[DataRequired(),Length(8,message='At least 8 characters.')])
     repeat_password = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
     email = StringField('Email', validators=[DataRequired(),Email() ])
@@ -63,7 +64,7 @@ class EditProfileForm(FlaskForm):
     nickname = StringField('Nickname', validators=[DataRequired()])
     description = TextAreaField('About me', validators=[Length(min=0, max=200)])
     phone = IntegerField('Phone number', validators=[DataRequired()])
-    position = RadioField('Position', validators=[DataRequired()], choices=[('B','build'), ('O','office')])
+    gender = RadioField('Gender', validators=[DataRequired()], choices=[('male','Male'), ('female','Female')])
     submit = SubmitField('Submit')
 
     def __init__(self, orginal_name, *args, **kwargs):
@@ -92,9 +93,17 @@ class CompanyForm(FlaskForm):
             raise ValidationError('Please use a different name of your Company.')
 
     def validate_web_page(self, web_page):
-        web = Company.query.filter_by(web_page=web_page.data).first()
-        if web is not None:
-            raise ValidationError('For this web page company already exist.')
+        if web_page.data is not None:
+            web = Company.query.filter_by(web_page=web_page.data).first()
+            if web is not None:
+                raise ValidationError('For this web page company already exist.')
+            try:
+                r = requests.get(web_page.data)
+                if r.status_code is not 200:
+                    raise ValidationError("This page doesn`t work.")
+            except requests.exceptions.ConnectionError:
+                raise ValidationError("This page dosn`t exist.")
+
 
 
 class BuildForm(FlaskForm):

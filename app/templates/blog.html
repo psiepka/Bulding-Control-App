@@ -8,10 +8,7 @@
 <br>
 <table border="1">
 {% for post in posts %}
-    <tr>
-        <td> <a href="{{url_for('profile_user',nickname=post.author.nickname) }}">{{post.author.name}} {{post.author.surname}} </a>: </td>
-        <td>{{post.body}}</td>
-    </tr>
+    {% include '_post.html' %}
 {% endfor %}
 </table>
 {% endblock %}

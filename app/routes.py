@@ -54,7 +54,7 @@ def registration():
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(nickname=form.nickname.data, name=form.name.data, surname=form.surname.data,
-                    phone=form.phone.data, position=form.position.data, email = form.email.data)
+                    phone=form.phone.data, gender=form.gender.data, email = form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -78,13 +78,13 @@ def edit_profile():
         current_user.nickname = form.nickname.data
         current_user.description = form.description.data
         current_user.phone = form.phone.data
-        current_user.position = form.position.data
+        current_user.gender = form.gender.data
         db.session.commit()
         flash('You changes are save on profile')
         return redirect(url_for('profile_user',nickname=current_user.nickname))
     elif request.method == 'GET':
         form.nickname.data = current_user.nickname
-        form.position.data = current_user.position
+        form.gender.data = current_user.gender
         form.description.data = current_user.description
         form.phone.data = current_user.phone
     return render_template('edit_profile.html', form=form, title='Edit profile')
@@ -196,3 +196,35 @@ def add_post():
         flash('You post is now avaible ')
         return redirect(url_for('blog'))
     return render_template('add_post.html', form=form, title='Add post')
+
+
+@login_required
+@app.route('/follow/<nickname>')
+def follow(nickname):
+    user = User.query.filter_by(nickname=nickname).first()
+    if user is None:
+        flash('User {} not found.'.format(nickname))
+        return redirect(url_for('index'))
+    if user == current_user:
+        flash('You cant follow yourself!')
+        return redirect(url_for('profile_user', nickname=nickname))
+    current_user.follow(user)
+    db.session.commit()
+    flash('You are following {}!'.format(nickname))
+    return redirect(url_for('profile_user', nickname=nickname))
+
+
+@login_required
+@app.route('/unfollow/<nickname>')
+def unfollow(nickname):
+    user = User.query.filter_by(nickname=nickname).first()
+    if user is None:
+        flash('User {} not found.'.format(nickname))
+        return redirect(url_for('index'))
+    if user == current_user:
+        flash('You cant unfollow yourself!')
+        return redirect(url_for('profile_user', nickname=nickname))
+    current_user.unfollow(user)
+    db.session.commit()
+    flash('You are  not following {}!'.format(nickname))
+    return redirect(url_for('profile_user', nickname=nickname))
