@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, RadioField, IntegerField, PasswordField, BooleanField, SubmitField, PasswordField, TextAreaField
+from wtforms import StringField, RadioField, IntegerField, PasswordField, BooleanField, SubmitField, PasswordField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length, NumberRange, URL
 import requests
+from app import app
 from app.models import User, Company, Build
 
 
@@ -62,9 +63,12 @@ class EditProfileForm(FlaskForm):
         FlaskForm edit profile  -- type som thing about you, you can change you position, phone number, nickname
     """
     nickname = StringField('Nickname', validators=[DataRequired()])
+    avatar = FileField('Change avatar')
     description = TextAreaField('About me', validators=[Length(min=0, max=200)])
     phone = IntegerField('Phone number', validators=[DataRequired()])
     gender = RadioField('Gender', validators=[DataRequired()], choices=[('male','Male'), ('female','Female')])
+    linkedin = StringField('Linkedin')
+    curriculum_vitae = FileField('Curriculum Vitae')
     submit = SubmitField('Submit')
 
     def __init__(self, orginal_name, *args, **kwargs):
@@ -76,6 +80,22 @@ class EditProfileForm(FlaskForm):
             user = User.query.filter_by(nickname=nickname.data).first()
             if user is not None:
                 raise ValidationError('Please use a different nickname.')
+
+    def validate_avatar(self, avatar):
+        if avatar.data:
+            file_ext = avatar.data.filename.rsplit('.',1)[1].lower()
+            if file_ext not in app.config['IMAGES']:
+                raise ValidationError('File with this extension is unacceptable.')
+
+    def validate_linkedin(self, linkedin):
+        if not linkedin.data.startswith('https://www.linkedin.com/'):
+            raise ValidationError('Please type correct adress to your linkedin profile.')
+
+    def validate_curriculum_vitae(self, curriculum_vitae):
+        if curriculum_vitae.data:
+            file_ext = curriculum_vitae.data.filename.rsplit('.',1)[1].lower()
+            if file_ext not in app.config['ALLOWED_EXTENSIONS']:
+                raise ValidationError('File with this extension is unacceptable.')
 
 
 class CompanyForm(FlaskForm):

@@ -7,23 +7,48 @@
         <th> <img src="{{ user.avatar() }}" alt="avatar" width="100"></th>
         <th><h1>{{user.name }} {{user.surname }}</h1></th>
     </tr>
-    {% if user.last_seen %}
-    <tr>
-        <td>Active : </td>
-        <td>{{ user.last_seen.strftime('%d %B %Y - %H:%M:%S') }}</td>
-    </tr>
-    {% endif %}
-    {% if user.description %}
-    <tr>
-        <td>Self description : </td>
-        <td>{{ user.description }}</td>
-    </tr>
-    {% endif %}
     {% if user == current_user %}
     <tr>
         <td colspan="2"><button><a  href="{{url_for('edit_profile')}}">Edit profile</a> </button></td>
     </tr>
+    {% elif not current_user.is_following(user) %}
+    <tr>
+        <td colspan="2"><button><a href="{{url_for('follow',nickname=user.nickname) }}">Follow</a></button></td>
+    </tr>
+    {% else  %}
+    <tr>
+        <td colspan="2"><button><a href="{{url_for('unfollow',nickname=user.nickname) }}">Unfollow</a></button></td>
+    </tr>
     {% endif %}
+    <table align="center">
+            <tr>
+                <td>Followers :</td>
+                <td>Followed :</td>
+            </tr>
+            <tr>
+                <td>{{user.followers.count()}}</td>
+                <td>{{user.followed.count()}}</td>
+            </tr>
+    </table>
+    <table>
+        {% if user.linkedin %}
+        <tr>
+            <td colspan="2"><a href="{{ user.linkedin }}" target="_blank">Profile on <strong>linkedin</strong></a></td>
+        </tr>
+        {% endif %}
+        {% if user.last_seen %}
+        <tr>
+            <td>Active : </td>
+            <td>{{ user.last_seen.strftime('%d %B %Y - %H:%M:%S') }}</td>
+        </tr>
+        {% endif %}
+        {% if user.description %}
+        <tr>
+            <td>Self description : </td>
+            <td>{{ user.description }}</td>
+        </tr>
+        {% endif %}
+    </table>
 </table>
 
 {% endblock %}

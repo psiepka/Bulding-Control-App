@@ -1,7 +1,9 @@
+import os
 from app import app, db
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_required, login_user, current_user, logout_user
 from werkzeug.urls import url_parse
+from werkzeug.utils import secure_filename
 from datetime import datetime
 from app.forms import LoginForm, PostForm, RegistrationForm, EditProfileForm, CompanyForm, BuildForm
 from app.models import User, Post, Company, Build
@@ -79,14 +81,30 @@ def edit_profile():
         current_user.description = form.description.data
         current_user.phone = form.phone.data
         current_user.gender = form.gender.data
+        current_user.linkedin = form.linkedin.data
+        if form.avatar.data:
+            f = form.avatar.data
+            f_ext = f.filename.rsplit('.',1)[1].lower()
+            filename = secure_filename('avatar '+current_user.nickname+'.'+f_ext)
+            f.save(os.path.join(
+                app.config['UPLOAD_FOLDER'], 'avatar', filename
+            ))
+        if form.curriculum_vitae.data:
+            f = form.curriculum_vitae.data
+            f_ext = f.filename.rsplit('.',1)[1]
+            filename = secure_filename('cv '+current_user.nickname+'.'+f_ext)
+            f.save(os.path.join(
+                app.config['UPLOAD_FOLDER'], 'cv', filename
+            ))
         db.session.commit()
         flash('You changes are save on profile')
-        return redirect(url_for('profile_user',nickname=current_user.nickname))
+        return redirect(url_for('profile_user', nickname=current_user.nickname))
     elif request.method == 'GET':
         form.nickname.data = current_user.nickname
         form.gender.data = current_user.gender
         form.description.data = current_user.description
         form.phone.data = current_user.phone
+        form.linkedin.data = current_user.linkedin
     return render_template('edit_profile.html', form=form, title='Edit profile')
 
 
@@ -112,8 +130,12 @@ def companies():
 def add_company():
     form = CompanyForm()
     if form.validate_on_submit():
-        company = Company(name=form.name.data, description=form.description.data,
-                            web_page=form.web_page.data)
+        if current_user.admin:
+            company = Company(name=form.name.data, description=form.description.data,
+                            web_page=form.web_page.data, verified=True)
+        else:
+            company = Company(name=form.name.data, description=form.description.data,
+                                web_page=form.web_page.data)
         db.session.add(company)
         db.session.commit()
         flash('Congratulation you create company!')
@@ -162,9 +184,14 @@ def builds():
 def add_build():
     form = BuildForm()
     if form.validate_on_submit():
-        build = Build(name=form.name.data, specification=form.specification.data,
+        if current_user.admin or current_user:
+            build = Build(name=form.name.data, specification=form.specification.data,
                         category=form.category.data, worth=form.worth.data, place=form.place.data,
-                        creater=current_user)
+                        creater=current_user, verified=True)
+        else:
+            build = Build(name=form.name.data, specification=form.specification.data,
+                            category=form.category.data, worth=form.worth.data, place=form.place.data,
+                            creater=current_user)
         db.session.add(build)
         db.session.commit()
         flash('Congratulation you create your own build!')

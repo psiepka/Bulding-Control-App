@@ -56,7 +56,14 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def avatar(self):
-        if self.gender == 'male':
+        f_img = os.path.join('app', 'static', 'upload', 'avatar', 'avatar_' + self.nickname)
+        if os.path.exists(f_img+'.'+'jpg'):
+            return os.path.join('..', 'static', 'upload', 'avatar', 'avatar_' + self.nickname+'.jpg')
+        elif os.path.isfile(f_img+'.'+'jpeg'):
+            return os.path.join('..', 'static', 'upload', 'avatar', 'avatar_' + self.nickname+'.jpeg')
+        elif os.path.isfile(f_img+'.'+'png'):
+            return os.path.join('..', 'static', 'upload', 'avatar', 'avatar_' + self.nickname+'.png')
+        elif self.gender == 'male':
             return os.path.join('..','static', 'img','male.jpg')
         else:
             return os.path.join('..','static', 'img','female.jpg')
@@ -115,30 +122,25 @@ class Company(db.Model):
     description = Column(String(1000))
     web_page = Column(String(100), unique=True)
     verified = Column(Boolean, default=False)
-    workers = relationship('Employee', backref='company_data', lazy='dynamic')
+    workers = relationship('Employee', backref='firm', lazy='dynamic')
     builds = relationship('Build', backref='contractor', lazy='dynamic')
     posts = relationship('Post', backref='company_forum', lazy='dynamic')
 
     def __repr__(self):
         return "<Company {}>".format(self.name)
 
-    def hire(self, user):
-        if not user in self.workers:
-            self.workers.append(user)
-
-    def fire(self, user):
-        if user in self.workers:
-            self.workers.remove(user)
+    def is_working(self, user):
+        return user.worker_id in self.workers
 
     def number_workers(self):
         return self.workers.count()
 
     def add_build(self, building):
-        if not building in self.builds:
+        if not building in self.builds.all():
             self.builds.append(building)
 
     def del_build(self, building):
-        if building in self.builds:
+        if building in self.builds.all():
             self.builds.remove(building)
 
 
@@ -160,6 +162,17 @@ class Employee(db.Model):
 
     def __repr__(self):
         return "<employee {}>".format(self.user.nickname)
+
+    def is_building(self, build):
+        return self.builds.filter(employees.c.build_id == build.id).count() > 0
+
+    def add_build(self, build):
+        if not self.is_building(build):
+            self.builds.append(build)
+
+    def del_build(self, build):
+        if self.is_building(build):
+            self.builds.remove(user)
 
 
 class Build(db.Model):

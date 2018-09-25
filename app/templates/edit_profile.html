@@ -4,8 +4,20 @@
 
 <h1>Edit Profile</h1>
 
-<form action="" method="POST" novalidate>
+<form action="" method="POST" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
+    <table>
+        <tr>
+            <td rowspan="2"><img src="{{ current_user.avatar() }}" alt="avatar" width="100"></td>
+            <td>{{ form.avatar.label }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.avatar }}</td>
+        </tr>
+        {% for error in form.avatar.errors %}
+        <span style='color: red;'>[{{ error }}]</span>
+        {% endfor %}
+    </table>
     <p>{{ form.nickname.label }}</p>
     <p>{{ form.nickname(size=32) }}</p>
     {% for error in form.nickname.errors %}
@@ -20,6 +32,16 @@
     <p>{{ form.gender.label }}</p>
     <p>{{ form.gender }} </p>
     {% for error in form.gender.errors %}
+    <span style='color: red;'>[{{ error }}]</span>
+    {% endfor %}
+    <p>{{ form.linkedin.label }}</p>
+    <p>{{ form.linkedin(size=32) }}</p>
+    {% for error in form.linkedin.errors %}
+    <span style='color: red;'>[{{ error }}]</span>
+    {% endfor %}
+    <p>{{ form.curriculum_vitae.label }}</p>
+    <p>{{ form.curriculum_vitae }}</p>
+    {% for error in form.curriculum_vitae.errors %}
     <span style='color: red;'>[{{ error }}]</span>
     {% endfor %}
     <p>{{ form.description.label }} </p>

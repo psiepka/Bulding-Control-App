@@ -12,4 +12,8 @@ class Config(object):
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    ADMINS = ['patrykeo001@gmail.com']
+    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER') or \
+    os.path.join(basedir, 'app', 'static', 'upload')
+    IMAGES = os.environ.get('IMAGES')
+    ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')
+    ADMINS = os.environ.get('ADMINS')
