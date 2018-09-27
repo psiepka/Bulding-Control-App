@@ -39,6 +39,11 @@
     {% for error in form.linkedin.errors %}
     <span style='color: red;'>[{{ error }}]</span>
     {% endfor %}
+    {% if current_user.curriculum_vitae() %}
+    <p>
+        <a href="{{ current_user.curriculum_vitae() }}" download="cv_frombudcontrol">Yours CV</a>
+    </p>
+    {% endif %}
     <p>{{ form.curriculum_vitae.label }}</p>
     <p>{{ form.curriculum_vitae }}</p>
     {% for error in form.curriculum_vitae.errors %}

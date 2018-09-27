@@ -5,7 +5,9 @@
 <h1>Builds </h1>
 All register in app builds.
 <br>
+{% if current_user.is_authenticated  %}
 <button><a href="{{url_for('add_build')}}">Add build</a></button>
+{% endif %}
 <br>
 <table>
     {% for build in builds %}

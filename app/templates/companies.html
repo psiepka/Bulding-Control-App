@@ -4,8 +4,11 @@
 
 <h1>Companies </h1> All register in app companies.
 <br>
+{% if current_user.is_authenticated  %}
 <button><a href="{{url_for('add_company')}}">Add company</a></button>
+{% endif %}
 <br>
+
 <table>
     {% for company in companies %}
     <tr>
@@ -13,5 +16,6 @@
         <td> <em>  {{ company.description }}</em></td>
     </tr>
     {% endfor %}
+
 </table>
 {% endblock %}

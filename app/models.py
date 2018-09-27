@@ -1,4 +1,4 @@
-import os
+import os, re
 from datetime import datetime
 from sqlalchemy import Column, Table, ForeignKey
 from sqlalchemy.types import Integer, String, Text, DateTime, Boolean
@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 from flask_admin.contrib.sqla import ModelView
-from app import db, login_manager, admin
+from app import app, db, login_manager, admin
 
 
 followers = db.Table('followers',
@@ -56,17 +56,24 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def avatar(self):
-        f_img = os.path.join('app', 'static', 'upload', 'avatar', 'avatar_' + self.nickname)
-        if os.path.exists(f_img+'.'+'jpg'):
-            return os.path.join('..', 'static', 'upload', 'avatar', 'avatar_' + self.nickname+'.jpg')
-        elif os.path.isfile(f_img+'.'+'jpeg'):
-            return os.path.join('..', 'static', 'upload', 'avatar', 'avatar_' + self.nickname+'.jpeg')
-        elif os.path.isfile(f_img+'.'+'png'):
-            return os.path.join('..', 'static', 'upload', 'avatar', 'avatar_' + self.nickname+'.png')
-        elif self.gender == 'male':
+        ex = [i for i in re.split("\W+", app.config['IMAGES']) if len(i)>1]
+        f_img = os.path.join('app', 'static', 'upload', 'avatar', 'avatar_' + str(self.id) + '.')
+        img = os.path.join('..', 'static', 'upload', 'avatar', 'avatar_' + str(self.id)+'.')
+        for extension in ex:
+            if os.path.isfile(f_img + extension):
+                return img + extension
+        if self.gender == 'male':
             return os.path.join('..','static', 'img','male.jpg')
         else:
             return os.path.join('..','static', 'img','female.jpg')
+
+    def curriculum_vitae(self):
+        ex = [i for i in re.split("\W+", app.config['ALLOWED_EXTENSIONS']) if len(i)>1]
+        f_cv = os.path.join('app', 'static', 'upload', 'cv', 'cv_' + str(self.id))
+        cv = os.path.join('..', 'static' , 'upload', 'cv', 'cv_' + str(self.id))
+        for extension in ex:
+            if os.path.isfile(f_cv + '.' + extension):
+                return cv + '.' + extension
 
     def is_following(self, user):
         return self.followed.filter(
@@ -82,12 +89,11 @@ class User(UserMixin, db.Model):
 
     def followed_posts(self):
         followed = Post.query.join(
-            followers.c.followed_id == Post.user_id).filter_by(
-                followers.c.follower_id == self.id).filter_by(
-                    Post.company_private == False).order_by(
-                    Post.timestamp.desc())
-        own = Post.query.filter_by(user_id=self.id).filter_by(company_private=False)
-        return followed.union(own).order_by(Post.timestamp.desc())
+            followers, (followers.c.followed_id == Post.user_id)).filter(
+                followers.c.follower_id == self.id)
+        own = Post.query.filter_by(user_id=self.id)
+        return followed.union(own).filter_by(private_company=False,company_id=None,build_id=None).order_by(Post.timestamp.desc())
+
 
 
 @login_manager.user_loader

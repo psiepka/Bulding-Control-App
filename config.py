@@ -17,3 +17,4 @@ class Config(object):
     IMAGES = os.environ.get('IMAGES')
     ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')
     ADMINS = os.environ.get('ADMINS')
+    MAX_CONTENT_LENGHT = os.environ.get('MAX_CONTENT_LENGHT')

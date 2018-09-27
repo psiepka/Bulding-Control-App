@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+
+<h1>Followers activity :</h1>
 <br>
-<br>
-{% if current_user.is_active %}
-<strong>Nice</strong> to see you {{current_user.name}} {{current_user.surname}}, have a good day! :)
-{% else %}
-Nice to see you anonymous user! Cool will be when you will <a href="{{url_for('login')}}"><strong>log in.</strong></a>
-{% endif %}
+{% for post in posts %}
+    {% include '_post.html' %}
+{% endfor %}
+
 {% endblock %}

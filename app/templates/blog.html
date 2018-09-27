@@ -2,13 +2,13 @@
 
 {% block content %}
 <h1>BLOG:</h1>
-{% if current_user.is_authenticated %}
-<button><a href="{{url_for('add_post')}}">ADD POST</a></button>
-{% endif %}
-<br>
-<table border="1">
+
+{% include '_add_post.html' %}
+
+
 {% for post in posts %}
     {% include '_post.html' %}
 {% endfor %}
-</table>
+
+
 {% endblock %}

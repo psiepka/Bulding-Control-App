@@ -43,7 +43,12 @@
     </tr>
     {% endif %}
 </table>
-<h1>Forum of {{build.name}} </h1>
 
+{% include '_add_post.html' %}
+
+
+{% for post in posts %}
+    {% include '_post.html' %}
+{% endfor %}
 
 {% endblock %}

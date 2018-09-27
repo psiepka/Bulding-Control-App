@@ -24,4 +24,10 @@
     </tr>
 </table>
 
+{% include '_add_post.html' %}
+
+{% for post in posts %}
+    {% include '_post.html' %}
+{% endfor %}
+
 {% endblock %}

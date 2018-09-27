@@ -1,4 +1,4 @@
-import os
+import os, re
 from app import app, db
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_required, login_user, current_user, logout_user
@@ -6,7 +6,7 @@ from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from app.forms import LoginForm, PostForm, RegistrationForm, EditProfileForm, CompanyForm, BuildForm
-from app.models import User, Post, Company, Build
+from app.models import User, Post, Company, Build, followers
 
 
 @app.before_request
@@ -16,10 +16,12 @@ def before_request():
         db.session.commit()
 
 
-@app.route('/')
+
 @app.route('/index')
+@login_required
 def index():
-    return render_template('index.html', title='HomePage')
+    posts = current_user.followed_posts()
+    return render_template('index.html', posts=posts, title='HomePage')
 
 
 @app.route('/login', methods=['GET','POST'])
@@ -36,10 +38,9 @@ def login():
         login_user(user, remember=form.remeber_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('index')
+            next_page = url_for('blog')
         return redirect(next_page)
     return render_template('login.html', form=form, title='Log in' )
-
 
 
 @app.route('/logout')
@@ -83,16 +84,21 @@ def edit_profile():
         current_user.gender = form.gender.data
         current_user.linkedin = form.linkedin.data
         if form.avatar.data:
+            ex = [i for i in re.split("\W+", app.config['IMAGES']) if len(i)>1]
+            f_img = os.path.join('app', 'static', 'upload', 'avatar', 'avatar_' + str(current_user.id) + '.')
+            for extension in ex:
+                if os.path.exists(f_img + extension):
+                    os.remove(f_img + extension)
             f = form.avatar.data
             f_ext = f.filename.rsplit('.',1)[1].lower()
-            filename = secure_filename('avatar '+current_user.nickname+'.'+f_ext)
+            filename = secure_filename('avatar '+str(current_user.id)+'.'+f_ext)
             f.save(os.path.join(
                 app.config['UPLOAD_FOLDER'], 'avatar', filename
             ))
         if form.curriculum_vitae.data:
             f = form.curriculum_vitae.data
             f_ext = f.filename.rsplit('.',1)[1]
-            filename = secure_filename('cv '+current_user.nickname+'.'+f_ext)
+            filename = secure_filename('cv '+str(current_user.id)+'.'+f_ext)
             f.save(os.path.join(
                 app.config['UPLOAD_FOLDER'], 'cv', filename
             ))
@@ -109,7 +115,6 @@ def edit_profile():
 
 
 @app.route('/companies')
-@login_required
 def companies():
     comp = [
         {
@@ -125,8 +130,9 @@ def companies():
     return render_template('companies.html', companies=companies, title='Companies')
 
 
-@login_required
+
 @app.route('/companies/add', methods=['GET','POST'])
+@login_required
 def add_company():
     form = CompanyForm()
     if form.validate_on_submit():
@@ -143,21 +149,28 @@ def add_company():
     return render_template('add_company.html', form=form, title='Create Company')
 
 
-@login_required
-@app.route('/companies/<int:company_id>')
+@app.route('/companies/<int:company_id>', methods=['GET','POST'])
 def profile_company(company_id):
     company = Company.query.filter_by(id=company_id).first_or_404()
-    return render_template('profile_company.html', company=company, title=company.name+' profile')
+    posts = Post.query.filter_by(private_company=False, company_forum=company, build_forum=None).order_by(Post.timestamp.desc())
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(body=form.body.data, author=current_user, company_forum=company)
+        db.session.add(post)
+        db.session.commit()
+        flash('You post is now avaible ')
+        return redirect(url_for('profile_company', company_id=company.id))
+    return render_template('profile_company.html', form=form, posts=posts, company=company, title=company.name+' profile')
 
 
-@login_required
 @app.route('/companies/<int:company_id>/employees')
+@login_required
 def employees(company_id):
     company = Company.query.filter_by(id=company_id).first_or_404()
     return render_template('employees.html', company=company, title=company.name+' employees')
 
+
 @app.route('/builds')
-@login_required
 def builds():
     builds = Build.query.all()
     b = [
@@ -179,12 +192,12 @@ def builds():
     return render_template('builds.html', builds=builds, title='All builds')
 
 
-@login_required
 @app.route('/builds/add', methods=['GET','POST'])
+@login_required
 def add_build():
     form = BuildForm()
     if form.validate_on_submit():
-        if current_user.admin or current_user:
+        if current_user.admin or current_user.worker_id.admin:
             build = Build(name=form.name.data, specification=form.specification.data,
                         category=form.category.data, worth=form.worth.data, place=form.place.data,
                         creater=current_user, verified=True)
@@ -199,22 +212,23 @@ def add_build():
     return render_template('add_build.html', form=form, title='Create Build')
 
 
-@login_required
-@app.route('/builds/<int:build_id>')
+@app.route('/builds/<int:build_id>', methods=['GET','POST'])
 def profile_build(build_id):
     build = Build.query.filter_by(id=build_id).first_or_404()
-    return render_template('profile_build.html', build=build, title=build.name)
+    posts = Post.query.filter_by(build_forum=build, private_company=False).order_by(Post.timestamp.desc())
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(body=form.body.data, author=current_user, build_forum=build)
+        db.session.add(post)
+        db.session.commit()
+        flash('You post is now avaible ')
+    return render_template('profile_build.html', build=build, form=form, posts=posts, title=build.name)
 
 
-@app.route('/blog')
+@app.route('/', methods=['GET','POST'])
+@app.route('/blog', methods=['GET','POST'])
 def blog():
-    posts = Post.query.all()
-    return render_template('blog.html',posts=posts, title='MicroBlog')
-
-
-@login_required
-@app.route('/blog/add', methods=['GET','POST'])
-def add_post():
+    posts = Post.query.filter_by(private_company=False, build_forum=None, company_forum=None).order_by(Post.timestamp.desc())
     form = PostForm()
     if form.validate_on_submit():
         post = Post(body=form.body.data, author=current_user)
@@ -222,11 +236,11 @@ def add_post():
         db.session.commit()
         flash('You post is now avaible ')
         return redirect(url_for('blog'))
-    return render_template('add_post.html', form=form, title='Add post')
+    return render_template('blog.html', posts=posts, form=form,  title='MicroBlog')
 
 
-@login_required
 @app.route('/follow/<nickname>')
+@login_required
 def follow(nickname):
     user = User.query.filter_by(nickname=nickname).first()
     if user is None:
@@ -241,8 +255,8 @@ def follow(nickname):
     return redirect(url_for('profile_user', nickname=nickname))
 
 
-@login_required
 @app.route('/unfollow/<nickname>')
+@login_required
 def unfollow(nickname):
     user = User.query.filter_by(nickname=nickname).first()
     if user is None:
