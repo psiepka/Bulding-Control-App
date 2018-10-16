@@ -1,61 +1,15 @@
 {% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
-{% block content %}
+{% block app_content %}
 
 <h1>Edit Profile</h1>
+<div class="row">
+    <div class="col-md-6">
+        {{ wtf.quick_form(form) }}
+    </div>
+</div>
+<br><br><br>
 
-<form action="" method="POST" enctype="multipart/form-data">
-    {{ form.hidden_tag() }}
-    <table>
-        <tr>
-            <td rowspan="2"><img src="{{ current_user.avatar() }}" alt="avatar" width="100"></td>
-            <td>{{ form.avatar.label }}</td>
-        </tr>
-        <tr>
-            <td>{{ form.avatar }}</td>
-        </tr>
-        {% for error in form.avatar.errors %}
-        <span style='color: red;'>[{{ error }}]</span>
-        {% endfor %}
-    </table>
-    <p>{{ form.nickname.label }}</p>
-    <p>{{ form.nickname(size=32) }}</p>
-    {% for error in form.nickname.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-    <p>{{ form.phone.label }}</p>
-    <p>{{ form.phone(size=32) }}</p>
-    {% for error in form.phone.errors %}
-    <span style='color:red;'>[{{ error }}]</span>
-    {% endfor %}
-    </p>
-    <p>{{ form.gender.label }}</p>
-    <p>{{ form.gender }} </p>
-    {% for error in form.gender.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-    <p>{{ form.linkedin.label }}</p>
-    <p>{{ form.linkedin(size=32) }}</p>
-    {% for error in form.linkedin.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-    {% if current_user.curriculum_vitae() %}
-    <p>
-        <a href="{{ current_user.curriculum_vitae() }}" download="cv_frombudcontrol">Yours CV</a>
-    </p>
-    {% endif %}
-    <p>{{ form.curriculum_vitae.label }}</p>
-    <p>{{ form.curriculum_vitae }}</p>
-    {% for error in form.curriculum_vitae.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-    <p>{{ form.description.label }} </p>
-    <p>{{ form.description(cols=50, rows=4)  }}</p>
-    {% for error in form.description.errors %}
-    <span style='color:red;'>[{{ error }}]</span>
-    {% endfor %}
-    </p>
-    <p>{{ form.submit() }}</p>
-</form>
 
 {% endblock %}

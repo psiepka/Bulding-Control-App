@@ -1,26 +1,14 @@
 {% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
-{% block content %}
+{% block app_content %}
 
-<table>
-    <tr>
-        <th> <img src="{{ user.avatar() }}" alt="avatar" width="100"></th>
-        <th><h1>{{user.name }} {{user.surname }}</h1></th>
-    </tr>
-    {% if user == current_user %}
-    <tr>
-        <td colspan="2"><button><a  href="{{url_for('edit_profile')}}">Edit profile</a> </button></td>
-    </tr>
-    {% elif not current_user.is_following(user) %}
-    <tr>
-        <td colspan="2"><button><a href="{{url_for('follow',nickname=user.nickname) }}">Follow</a></button></td>
-    </tr>
-    {% else  %}
-    <tr>
-        <td colspan="2"><button><a href="{{url_for('unfollow',nickname=user.nickname) }}">Unfollow</a></button></td>
-    </tr>
-    {% endif %}
-    <table align="center">
+<div class="container">
+    <table class="table table-bordered"">
+            <tr>
+                <th rowspan="4" width=80px> <img src="{{ user.avatar() }}" alt="avatar" width="100"></th>
+                <th colspan="2"><h1>{{user.name }} {{user.surname }}</h1></th>
+            </tr>
             <tr>
                 <td>Followers :</td>
                 <td>Followed :</td>
@@ -29,26 +17,85 @@
                 <td>{{user.followers.count()}}</td>
                 <td>{{user.followed.count()}}</td>
             </tr>
-    </table>
-    <table>
-        {% if user.linkedin %}
-        <tr>
-            <td colspan="2"><a href="{{ user.linkedin }}" target="_blank">Profile on <strong>linkedin</strong></a></td>
-        </tr>
+            {% if user == current_user %}
+            <tr>
+                <td colspan="2"><button type="button" class="btn btn-outline-warning"><a  href="{{url_for('edit_profile')}}">Edit profile</a> </button></td>
+            </tr>
+            {% elif not current_user.is_following(user) %}
+            <tr>
+                <td colspan="2"><button type="button" class="btn btn-outline-dark"><a href="{{url_for('follow',nickname=user.nickname) }}">Follow</a></button></td>
+            </tr>
+            {% else  %}
+            <tr>
+                <td colspan="2"><button type="button" class="btn btn-outline-dark"><a href="{{url_for('unfollow',nickname=user.nickname) }}">Unfollow</a></button></td>
+            </tr>
+            {% endif %}
+            <table class="table table-hover">
+                {% if user.linkedin %}
+                <tr>
+                    <td colspan="3"><a href="{{ user.linkedin }}" target="_blank">Profile on <strong>linkedin</strong></a></td>
+                </tr>
+                {% endif %}
+                {% if user.last_seen %}
+                <tr>
+                    <td>Active : </td>
+                    <td colspan="2">{{ moment(user.last_seen).format('LLL') }}</td>
+                </tr>
+                {% endif %}
+                {% if user.description %}
+                <tr>
+                    <td>Self description : </td>
+                    <td colspan="2">{{ user.description }}</td>
+                </tr>
+                {% endif %}
+                {% if user.worker_id %}
+                <tr>
+                    <td>Work in: </td>
+                    <td><a href="{{url_for('profile_company',company_id=user.worker_id.firm.id)}}">{{user.worker_id.firm.name}}</a></td>
+                    <td><a href="{{url_for('quit_job')}}"><button type="button" class="btn btn-outline-danger">Quit job</button></a></td>
+                </tr>
+                {% endif %}
+            </table>
+        </table>
+        {% if user != current_user and current_user.worker_id and current_user.worker_id.admin  %}
+            <p>
+                <button type="button" class="btn btn-outline-primary" data-toggle="collapse" data-target="#formAddWork" aria-expanded="false">
+                    Add work offer
+                </button>
+            </p>
+                <div class="collapse" id="formAddWork">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ wtf.quick_form(form) }}
+                        </div>
+                    </div>
+                </div>
         {% endif %}
-        {% if user.last_seen %}
-        <tr>
-            <td>Active : </td>
-            <td>{{ user.last_seen.strftime('%d %B %Y - %H:%M:%S') }}</td>
-        </tr>
+        {% if user != current_user %}
+            <a href="{{ url_for('user_offers', nickname=user.nickname) }}"><button type="button" class="btn btn-outline-info">Work offers</button></a>
+        {% else %}
+            <a href="{{ url_for('self_workoffer') }}"><button type="button" class="btn btn-outline-info">Work offers</button></a>
         {% endif %}
-        {% if user.description %}
-        <tr>
-            <td>Self description : </td>
-            <td>{{ user.description }}</td>
-        </tr>
-        {% endif %}
-    </table>
-</table>
-
+{% if posts %}
+<br>
+<h2>Activity:</h2>
+{% for post in posts %}
+    {% include '_post.html' %}
+{% endfor %}
+{% endif %}
+</div>
+<nav aria-label="...">
+    <ul class="pager">
+        <li class="previous{% if not prev_url %} disabled{% endif %}">
+            <a href="{{ prev_url or '#' }}">
+                <span aria-hidden="true">&larr;</span> Newer posts
+            </a>
+        </li>
+        <li class="next{% if not next_url %} disabled{% endif %}">
+            <a href="{{ next_url or '#' }}">
+                Older posts <span aria-hidden="true">&rarr;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 {% endblock %}

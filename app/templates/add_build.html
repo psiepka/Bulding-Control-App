@@ -1,42 +1,12 @@
 {% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
-{% block content %}
+{% block app_content %}
 
 <h1>Add Build</h1>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <p>{{ form.name.label }}</p>
-    <p>{{ form.name}}</p>
-    {% for error in form.name.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-
-    <p>{{ form.specification.label }}</p>
-    <p>{{ form.specification }}</p>
-    {% for error in form.specification.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-
-    <p>{{form.category.label }}</p>
-    <p>{{form.category }}</p>
-    {% for error in form.category.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-
-    <p>{{form.worth.label }}</p>
-    <p>{{form.worth }}</p>
-    {% for error in form.worth.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-
-    <p>{{form.place.label }}</p>
-    <p>{{form.place }}</p>
-    {% for error in form.place.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-
-    <p>{{form.submit}}</p>
-
-</form>
-
+<div class="row">
+    <div class="col-md-6">
+        {{ wtf.quick_form(form) }}
+    </div>
+</div>
 {% endblock %}

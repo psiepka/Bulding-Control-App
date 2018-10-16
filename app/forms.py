@@ -1,9 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, RadioField, IntegerField, PasswordField, BooleanField, SubmitField, PasswordField, TextAreaField, FileField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length, NumberRange, URL
+from wtforms.fields.html5 import DateField
+from wtforms.validators import DataRequired, Email, EqualTo, Optional, ValidationError, Length, NumberRange
 import requests
 from app import app
-from app.models import User, Company, Build
+from app.models import User, Company, Build, Employee, JobApp, Post
 
 
 class RegistrationForm(FlaskForm):
@@ -88,8 +89,9 @@ class EditProfileForm(FlaskForm):
                 raise ValidationError('File with this extension is unacceptable.')
 
     def validate_linkedin(self, linkedin):
-        if not linkedin.data.startswith('https://www.linkedin.com/'):
-            raise ValidationError('Please type correct adress to your linkedin profile.')
+        if linkedin.data:
+            if not linkedin.data.startswith('https://www.linkedin.com/'):
+                raise ValidationError('Please type correct adress to your linkedin profile.')
 
     def validate_curriculum_vitae(self, curriculum_vitae):
         if curriculum_vitae.data:
@@ -113,7 +115,7 @@ class CompanyForm(FlaskForm):
             raise ValidationError('Please use a different name of your Company.')
 
     def validate_web_page(self, web_page):
-        if web_page.data is not None:
+        if web_page.data:
             web = Company.query.filter_by(web_page=web_page.data).first()
             if web is not None:
                 raise ValidationError('For this web page company already exist.')
@@ -151,3 +153,63 @@ class PostForm(FlaskForm):
     """
     body = TextAreaField('Post', validators=[DataRequired(), Length(1,2000)])
     submit = SubmitField('Submit')
+
+
+class JobAppForm(FlaskForm):
+    salary = IntegerField('Salary', validators=[DataRequired()])
+    position = StringField('Position', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+
+class EditBuildForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    specification = StringField('Specification', validators=[DataRequired()])
+    category = StringField('Category', validators=[DataRequired()])
+    start_date = DateField('Start date', validators=[Optional()])
+    end_date = DateField('End date',  validators=[Optional()])
+    contractor = StringField('Company')
+    worth = IntegerField('Value', validators=[DataRequired()])
+    place = StringField('Place', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+    def __init__(self, orginal_name, *args, **kwargs):
+        super(EditBuildForm, self).__init__(*args, **kwargs)
+        self.orginal_name = orginal_name
+
+    def validate_name(self, name):
+        if name.data != self.orginal_name:
+            name = Build.query.filter_by(name=name.data).first()
+            if name is not None:
+                raise ValidationError('Please use a different name of Building.')
+
+    def validate_contractor(self, contractor):
+        if contractor.data:
+            company = Company.query.filter_by(name=contractor.data).first()
+            if company is None:
+                raise ValidationError('This company doesnt exist in app')
+
+
+class ResetPasswordRequestForm(FlaskForm):
+    email = StringField('Email',validators=[DataRequired(), Email()])
+    submit = SubmitField('Passowrd Reset')
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired(),])
+    password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password2')])
+    submit = SubmitField('Request Password Reset')
+
+    def validate_password(self, password):
+        p = password.data
+        n = 0
+        u = 0
+        l = 0
+        for i in p:
+            if i.islower():
+                l += 1
+            if i.isupper():
+                u += 1
+            if i.isdigit():
+                n += 1
+        if n == 0 or u == 0 or l == 0:
+            raise ValidationError('Password must contain one digit, one lowercase letter one uppercase letter.')

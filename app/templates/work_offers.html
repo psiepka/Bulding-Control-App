@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+
+
+<h1>Work offers  :</h1>
+<br>
+{% for offer in offers %}
+
+<form action="" method="POST">
+    <table>
+        <tr valign="center">
+            <td><img src="{{offer.sender.user.avatar() }}" alt="avatar {{ offer.sender.user.nickname}}" width="36" height="36"></td>
+            <td> <a href="{{url_for('profile_user',nickname=offer.sender.user.nickname) }}">{{offer.sender.user.name}} {{offer.sender.user.surname}} from company <strong>{{ offer.sender.firm.name }}</strong> </a>: </td>
+            <td>Offer you : Salary - {{offer.salary}} as {{offer.position}} </td>
+            <td> {{ offer.description }} </td>
+        </tr>
+    </table>
+    {% if not current_user.worker_id %}
+        <button class="btn" name="id" type="submit" value="{{offer.id}}">Accept</button>
+    {% endif %}
+</form>
+{% endfor %}
+
+{% endblock %}

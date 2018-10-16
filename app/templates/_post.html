@@ -1,7 +1,32 @@
-<table>
+<table class="table table-bordered">
     <tr valign="center">
-        <td><img src="{{post.author.avatar() }}" alt="avatar od {{ current_user.nickname}}" width="36" height="36"></td>
-        <td> <a href="{{url_for('profile_user',nickname=post.author.nickname) }}">{{post.author.name}} {{post.author.surname}} </a>: </td>
-        <td>{{post.body}}</td>
+        <td width="70px" rowspan="2">
+            <a href="{{url_for('profile_user',nickname=post.author.nickname) }}">
+                <img src="{{post.author.avatar() }}" alt="avatar {{ current_user.nickname}}" width="60" height="60">
+            </a>
+        </td>
+        <td style="margin-top:10px">
+            <a href="{{url_for('profile_user',nickname=post.author.nickname) }}">
+                {{post.author.name}} {{post.author.surname}} 
+            </a>
+            {{ moment(post.timestamp).fromNow() }}
+            {% if post.company_forum %}
+            in 
+            <a href="{{url_for('profile_company',company_id=post.company_forum.id)}}">
+                {{ post.company_forum.name }}
+            </a>
+            {% elif post.build_forum %}
+            in 
+            <a href="{{ url_for('profile_build', build_id=post.build_forum.id) }}">
+                {{ post.build_forum.name }}
+            </a>
+            {% endif %}
+            :
+        </td>
+    </tr>
+    <tr>
+        <td>
+            {{post.body}}
+        </td>
     </tr>
 </table>

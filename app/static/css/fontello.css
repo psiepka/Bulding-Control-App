@@ -57,7 +57,7 @@
  
 .icon-mail:before { content: '\e800'; } /* '' */
 .icon-user:before { content: '\e801'; } /* '' */
-.icon-hammer:before { content: '\e802'; font-size: 90px} /* '' */
+.icon-hammer:before { content: '\e802'; font-size: 22px } /* '' */
 .icon-mail-alt:before { content: '\f0e0'; } /* '' */
 .icon-github:before { content: '\f113'; } /* '' */
 .icon-facebook-squared:before { content: '\f308'; } /* '' */

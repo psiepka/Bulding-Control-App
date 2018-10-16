@@ -1,29 +1,18 @@
 {% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
-{% block content %}
+{% block app_content %}
 
-<h1>Add Company</h1>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <p>{{ form.name.label }}</p>
-    <p>{{ form.name}}</p>
-    {% for error in form.name.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
+{% if current_user.worker_id == None %}
+    <h1>Add Company</h1>
+    <div class="row">
+        <div class="col-md-6">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+{% else %}
+    <p> <strong>You alreade have company dude...</strong> </p>
+{% endif %}
 
-    <p>{{ form.description.label }}</p>
-    <p>{{ form.description }}</p>
-    {% for error in form.description.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-
-    <p>{{form.web_page.label }}</p>
-    <p>{{form.web_page }}</p>
-    {% for error in form.web_page.errors %}
-    <span style='color: red;'>[{{ error }}]</span>
-    {% endfor %}
-    <p>{{form.submit}}</p>
-
-</form>
 
 {% endblock %}

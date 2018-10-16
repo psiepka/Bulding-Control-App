@@ -6,6 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
 from flask_admin import Admin, AdminIndexView
+from flask_mail import Mail
+from flask_bootstrap import Bootstrap
+from flask_moment import Moment
 from config import Config
 
 
@@ -17,6 +20,9 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message = u'Dudee, you must SIGN IN to acess this page.'
 login_manager.login_message_category = 'info'
+mail = Mail(app)
+bootstrap = Bootstrap(app)
+moment = Moment(app)
 
 
 class MyAdminIndexView(AdminIndexView):

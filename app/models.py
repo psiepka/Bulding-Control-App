@@ -1,7 +1,8 @@
-import os, re
+import os, re, jwt
+from time import time
 from datetime import datetime
 from sqlalchemy import Column, Table, ForeignKey
-from sqlalchemy.types import Integer, String, Text, DateTime, Boolean
+from sqlalchemy.types import Integer, String, Text, DateTime, Boolean, Date
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
@@ -45,6 +46,11 @@ class User(UserMixin, db.Model):
         primaryjoin=(followers.c.follower_id == id),
         secondaryjoin=(followers.c.followed_id == id),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
+    job_recipient = relationship('JobApp',
+                                foreign_keys='JobApp.offer_recipient',
+                                backref='recipient', lazy='dynamic'
+                                )
+    last_jobapp_read = db.Column(db.DateTime)
 
     def __repr__(self):
         return '<User {} {}>'.format(self.name, self.surname)
@@ -92,8 +98,34 @@ class User(UserMixin, db.Model):
             followers, (followers.c.followed_id == Post.user_id)).filter(
                 followers.c.follower_id == self.id)
         own = Post.query.filter_by(user_id=self.id)
-        return followed.union(own).filter_by(private_company=False,company_id=None,build_id=None).order_by(Post.timestamp.desc())
+        return followed.union(own).filter_by(private_company=False).order_by(Post.timestamp.desc())
 
+    def new_jobapp(self):
+        last_read_time = self.last_jobapp_read or datetime(2000, 1, 1)
+        return JobApp.query.filter_by(recipient=self).filter(
+            JobApp.timestamp > last_read_time).count()
+
+    def self_receive_offer(self):
+        offers = JobApp.query.filter(JobApp.recipient == self)
+        return offers.order_by(JobApp.timestamp.desc())
+
+    def check_offer_user(self, user):
+        offers = JobApp.query.join(JobApp.sender).join(Employee.firm).filter(Company.name == self.worker_id.firm.name, JobApp.recipient == user).order_by(JobApp.timestamp.desc())
+        return offers
+
+    def get_reset_password_token(self, expires_in=300):
+        return jwt.encode(
+            {'reset_password' : self.id, 'exp' : time() + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+
+    @staticmethod
+    def verify_reset_passwordd_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.get(id)
 
 
 @login_manager.user_loader
@@ -131,6 +163,7 @@ class Company(db.Model):
     workers = relationship('Employee', backref='firm', lazy='dynamic')
     builds = relationship('Build', backref='contractor', lazy='dynamic')
     posts = relationship('Post', backref='company_forum', lazy='dynamic')
+    jobapp = relationship('JobApp', backref='company_id', lazy='dynamic')
 
     def __repr__(self):
         return "<Company {}>".format(self.name)
@@ -165,6 +198,9 @@ class Employee(db.Model):
     salary = Column(Integer)
     date_join = Column(DateTime, default=datetime.utcnow)
     builds = relationship("Build", secondary=employees, backref=db.backref('employers', lazy='dynamic'), lazy='dynamic')
+    emp_mail = Column(String(200))
+    emp_tel = Column(Integer)
+    job_sender = relationship('JobApp', backref='sender', lazy='dynamic')
 
     def __repr__(self):
         return "<employee {}>".format(self.user.nickname)
@@ -178,7 +214,7 @@ class Employee(db.Model):
 
     def del_build(self, build):
         if self.is_building(build):
-            self.builds.remove(user)
+            self.builds.remove(build)
 
 
 class Build(db.Model):
@@ -193,8 +229,8 @@ class Build(db.Model):
     worth = Column(Integer, nullable=False)
     place = Column(String(200), nullable=False)
     post_date = Column(DateTime, default=datetime.utcnow)
-    start_date = Column(DateTime)
-    end_date = Column(DateTime)
+    start_date = Column(Date)
+    end_date = Column(Date)
     verified = Column(Boolean, default=False)
     creater_id = Column(Integer, ForeignKey('user.id'))
     contractor_id = Column(Integer, ForeignKey('company.id'))
@@ -202,6 +238,20 @@ class Build(db.Model):
 
     def __repr__(self):
         return "<Build {}>".format(self.name)
+
+
+class JobApp(db.Model):
+    """
+    model for sending work offers or our application for job
+    """
+    id = Column(Integer, primary_key=True)
+    offer_sender = Column(Integer, ForeignKey('employee.id'))
+    offer_recipient = Column(Integer, ForeignKey('user.id'))
+    salary = Column(Integer, nullable=False)
+    date_send = Column(DateTime, default=datetime.utcnow)
+    position = Column(String(100), nullable=False)
+    company = Column(Integer, ForeignKey('company.id'))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 
 admin.add_view(ModelView(User, db.session))

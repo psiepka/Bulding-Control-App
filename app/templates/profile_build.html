@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
-{% block content %}
+{% block app_content %}
 
-<table>
+<table class="table">
     <tr>
         <th colspan="2"> {{build.name }} </th>
     </tr>
@@ -24,22 +24,24 @@
     </tr>
     {% if build.start_date %}
     <tr>
-        <td> Plannig start of build </td>
+        <td> Plannig start of build : </td>
         <td> {{ build.start_date }} </td>
     </tr>
     {% endif %}
     {% if build.end_date %}
     <tr>
-        <td> Plannig end of build </td>
+        <td> Plannig end of build : </td>
         <td> {{ build.end_date }} </td>
     </tr>
     {% endif %}
     <tr>
-        <td colspan="2"> Created by <a href="{{ url_for('profile_user', nickname=build.creater.nickname) }}">  <strong>{{build.creater.nickname}}</strong> </a></td>
+        <td> Created by : </td>
+        <td><a href="{{ url_for('profile_user', nickname=build.creater.nickname) }}">  <strong>{{build.creater.nickname}}</strong> </a></td>
     </tr>
     {% if build.contractor_id %}
     <tr>
-        <td colspan="2"> Contract is executed by <a href="{{ url_for('profile_company',company_id=build.contractor.id) }}">{{ build.contractor.name }} </a></td>
+        <td> Contractor :</td>
+        <td> <a href="{{ url_for('profile_company',company_id=build.contractor.id) }}">{{ build.contractor.name }} </a></td>
     </tr>
     {% endif %}
 </table>
@@ -51,4 +53,18 @@
     {% include '_post.html' %}
 {% endfor %}
 
+<nav aria-label="...">
+    <ul class="pager">
+        <li class="previous{% if not prev_url %} disabled{% endif %}">
+            <a href="{{ prev_url or '#' }}">
+                <span aria-hidden="true">&larr;</span> Newer posts
+            </a>
+        </li>
+        <li class="next{% if not next_url %} disabled{% endif %}">
+            <a href="{{ next_url or '#' }}">
+                Older posts <span aria-hidden="true">&rarr;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 {% endblock %}

@@ -1,85 +1,4 @@
-body
-{
-    height: 100%;
-    position:relative;
-    background-image: url(../img/vintage-concrete.png);
-    font-family: 'Lato', sans-serif;
-    min-height:100%
-}
-#form1
-{
-    display: none;
-    
-}
 
-.option a{
-    color: #c0c0c0
-}
-.header
-{
-    margin: auto;
-    background-color:#e1e1d0;
-    text-align: center;
-}
-.header .page-logo{
-    float: left;
-}
-.header .page-name{
-    font-family: 'Indie Flower', cursive;
-    font-weight: 900;
-    font-size: 44px;
-    text-align: left;
-    padding: 10px;
-    float: left;
-}
-.header .user-data{
-    margin-top: 20px;
-    font-size: 18px;
-    float: right;
-    text-align: right;
-}
-.navigation{
-    text-align: center;
-    background-color: #312f2f;
-    margin-top: 20px;
-    color: #ffffff;
-    padding: 10px
-}
-.navigation .option{
-    text-align: center;
-    float: left;
-    min-width: 50px;
-    font-size: 18px;
-    height: 25px;
-    padding: 10px;
-    border-right: 2px dotted #fffff1;
-    opacity: 0.8;
-}
-.navigation .option:hover{
-    background-color: #000000;
-    cursor: context-menu
-}
-.navigation .option:visited{
-    background-color: #000000;
-    cursor: context-menu;
-}
-.navigation .option:active{
-    background-color: #000000;
-    cursor: context-menu;
-    color: white;
-}
-.content{
-    background-color: blanchedalmond;
-    float: left;
-    padding: 20px;
-    padding-bottom:60px;
-}
-.banner{
-    background-color: darkgray;
-    width: 15%;
-    float: right;
-    height: 100%;
-}
 .footer{
     clear: both;
     position: fixed;
@@ -91,9 +10,6 @@ body
     text-align: center;
 }
 a{
-    color: #362828;
-    text-decoration: none
-}
-a.icons:hover{
-    color: #0c0b0b
+    color: black;
+    text-decoration: none;
 }

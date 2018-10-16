@@ -18,3 +18,4 @@ class Config(object):
     ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')
     ADMINS = os.environ.get('ADMINS')
     MAX_CONTENT_LENGHT = os.environ.get('MAX_CONTENT_LENGHT')
+    POST_PER_PAGE = int(os.environ.get('POST_PER_PAGE'))

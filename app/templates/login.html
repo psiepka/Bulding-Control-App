@@ -1,30 +1,25 @@
 {% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
-{% block content %}
+{% block app_content %}
 
-<h1>Hello, please sign in our amazing app</h1>
-<form action="" method="POST" novalidate>
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.nickname.label }} <br>
-        {{ form.nickname(size=32) }}
-        {% for error in form.nickname.errors %} <br>
-        <span style='color:red;'>[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.password.label }} <br>
-        {{ form.password(size=32) }} <br>
-        {% for error in form.password.errors %}
-        <span style='color:red;'>[{{ error }}]</span>
-        {% endfor %}
-    </p>
-    <p>
-        {{ form.remeber_me }} {{ form.remeber_me.label }}
-    </p>
-    <p> {{ form.submit() }} </p>
-</form>
+<h1 style="text-align:center">Sign in to BudApp </h1>
+<span class="border">
+    <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                {{ wtf.quick_form(form) }}
+            </div>
+        </div>
+</span>
+
+<p style="text-align:center">
+    <br>
+    Forgot Your Password?
+    <b><a class='link' href="{{ url_for('reset_password_request') }}">Click to Reset It</a></b>
+</p>
 <hr>
-<p><a href="{{ url_for('registration') }}">You dont have account yet? <b>Register in!</b></a></p>
+<p style="text-align:center">You dont have account yet? <a class='link' href="{{ url_for('registration') }}"><b>Register in!</b></a></p>
+
 
 {% endblock %}

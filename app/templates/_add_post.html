@@ -1,26 +1,19 @@
 
-<br>
+{% import 'bootstrap/wtf.html' as wtf %}
 {% if current_user.is_authenticated  %}
-    <button type="button" id="formButton">Add post</button>
-        <form id="form1" method="POST">
-            {{ form.hidden_tag() }}
-            <p>
-                {{ form.body.label }}<br>
-                {{ form.body(cols=32, rows=4) }}<br>
-                {% for error in form.body.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </p>
-            <p>{{ form.submit() }}</p>
-        </form>
+<p>
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#formAddPost" aria-expanded="false">
+        Add post
+    </button>
+</p>
+    <div class="collapse" id="formAddPost">
+        <div class="row">
+            <div class="col-xs-12">
+                {{ wtf.quick_form(form) }}
+            </div>
+        </div>
+    </div>
 
-    <script>
-        $("#formButton").click(function(){
-            $("#form1").toggle();
-        });
-    </script>
 {% else %}
-
-To add <b>comment</b> or many others, you must be <a href="{{url_for('login')}}"><strong>log in.</strong></a>
-
+    To add <b>comment</b> or many others, you must be <a href="{{url_for('login')}}"><strong>log in.</strong></a>
 {% endif %}
