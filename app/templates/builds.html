@@ -20,6 +20,11 @@
             {% endif %}
         </td>
         <td>
+            {% if current_user.worker_id and current_user.worker_id.is_building(build) %}
+                <div class="attention">Your build</div>
+            {% endif %}
+        </td>
+        <td>
             {% if build.contractor and current_user.worker_id and (build.contractor == current_user.worker_id.firm) %}
                 <a href="{{url_for('edit_build', build_id= build.id)}}"><button type="button" class="btn btn-link">Edit build</button></a>
             {% endif %}

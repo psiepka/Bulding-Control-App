@@ -15,10 +15,6 @@ followers = db.Table('followers',
     db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
 )
 
-employees = db.Table('employees',
-    db.Column('employee_id', db.Integer, db.ForeignKey('employee.id')),
-    db.Column('build_id', db.Integer, db.ForeignKey('build.id'))
-)
 
 class User(UserMixin, db.Model):
     """database for users in website
@@ -181,6 +177,12 @@ class Company(db.Model):
     def del_build(self, building):
         if building in self.builds.all():
             self.builds.remove(building)
+
+
+employees = db.Table('employees',
+    db.Column('employee_id', db.Integer, db.ForeignKey('employee.id')),
+    db.Column('build_id', db.Integer, db.ForeignKey('build.id'))
+)
 
 
 class Employee(db.Model):

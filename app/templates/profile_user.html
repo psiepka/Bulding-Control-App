@@ -19,7 +19,7 @@
             </tr>
             {% if user == current_user %}
             <tr>
-                <td colspan="2"><button type="button" class="btn btn-outline-warning"><a  href="{{url_for('edit_profile')}}">Edit profile</a> </button></td>
+                <td colspan="2"><a  href="{{url_for('edit_profile')}}"><button type="button" class="btn btn-warning">Edit profile</button></a></td>
             </tr>
             {% elif not current_user.is_following(user) %}
             <tr>
@@ -59,7 +59,7 @@
         </table>
         {% if user != current_user and current_user.worker_id and current_user.worker_id.admin  %}
             <p>
-                <button type="button" class="btn btn-outline-primary" data-toggle="collapse" data-target="#formAddWork" aria-expanded="false">
+                <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#formAddWork" aria-expanded="false">
                     Add work offer
                 </button>
             </p>
@@ -72,9 +72,9 @@
                 </div>
         {% endif %}
         {% if user != current_user %}
-            <a href="{{ url_for('user_offers', nickname=user.nickname) }}"><button type="button" class="btn btn-outline-info">Work offers</button></a>
+            <a href="{{ url_for('user_offers', nickname=user.nickname) }}"><button type="button" class="btn btn-info">Work offers</button></a>
         {% else %}
-            <a href="{{ url_for('self_workoffer') }}"><button type="button" class="btn btn-outline-info">Work offers</button></a>
+            <a href="{{ url_for('self_workoffer') }}"><button type="button" class="btn btn-info">Work offers</button></a>
         {% endif %}
 {% if posts %}
 <br>
