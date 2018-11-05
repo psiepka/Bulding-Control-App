@@ -20,7 +20,7 @@
             {% endif %}
         </td>
         <td>
-            {% if current_user.worker_id and current_user.worker_id.is_building(build) %}
+            {% if current_user.is_authenticated and current_user.worker_id and current_user.worker_id.is_building(build) %}
                 <div class="attention">Your build</div>
             {% endif %}
         </td>

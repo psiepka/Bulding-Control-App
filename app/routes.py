@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from functools import wraps
 from app.forms import LoginForm, PostForm, RegistrationForm, EditProfileForm, CompanyForm, BuildForm, JobAppForm, EditBuildForm, ResetPasswordForm, ResetPasswordRequestForm, EditCompanyForm
-from app.models import User, Post, Company, Build, followers, Employee, JobApp
+from app.models import User, Post, Company, Build, Employee, JobApp
 from app.email import send_password_reset_email
 
 
@@ -359,16 +359,16 @@ def profile_build(build_id):
     posts1 = Post.query.filter_by(build_forum=build, private_company=False).order_by(
         Post.timestamp.desc()).paginate(page, app.config['POST_PER_PAGE'], False)
     form1 = PostForm(prefix="form1")
+    posts2 = Post.query.filter_by(build_forum=build, private_company=True).order_by(
+        Post.timestamp.desc()).paginate(page_c, app.config['POST_PER_PAGE'], False)
+    form2 = PostForm(prefix="form2")
     if form1.validate_on_submit():
         post = Post(body=form1.body.data, author=current_user, build_forum=build)
         db.session.add(post)
         db.session.commit()
         flash('You post is now avaible ')
         return redirect(url_for('profile_build',build_id=build.id))
-    if current_user.worker_id.firm is build.contractor:
-        posts2 = Post.query.filter_by(build_forum=build, private_company=True).order_by(
-            Post.timestamp.desc()).paginate(page_c, app.config['POST_PER_PAGE'], False)
-        form2 = PostForm(prefix="form2")
+    if current_user.is_authenticated and current_user.worker_id.firm is build.contractor:
         if form2.validate_on_submit():
             post = Post(body=form2.body.data, author=current_user, build_forum=build, private_company=True)
             db.session.add(post)
@@ -383,8 +383,8 @@ def profile_build(build_id):
         if posts1.has_next else None
     prev_url_c = url_for('profile_build', build_id=build.id, page=posts1.prev_num) \
         if posts1.has_prev else None
-    return render_template('profile_build.html', build=build, form1=form1, form2=form2, next_url=next_url,
-                            posts1=posts1.items, posts2=posts2.items, title=build.name, prev_url=prev_url)
+    return render_template('profile_build.html', build=build, form1=form1, form2=form2, next_url=next_url, next_url_c=next_url_c,
+                            posts1=posts1.items, posts2=posts2.items, title=build.name, prev_url=prev_url, prev_url_c=prev_url_c)
 
 
 @app.route('/', methods=['GET','POST'])

@@ -26,12 +26,10 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different username.')
 
-
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email.')
-
 
     def validate_password(self, password):
         p = password.data
@@ -47,6 +45,7 @@ class RegistrationForm(FlaskForm):
                 n += 1
         if n == 0 or u == 0 or l == 0:
             raise ValidationError('Password must contain one digit, one lowercase letter one uppercase letter.')
+
 
 class LoginForm(FlaskForm):
     """

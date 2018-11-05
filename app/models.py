@@ -19,7 +19,18 @@ followers = db.Table('followers',
 class User(UserMixin, db.Model):
     """database for users in website
     Arguments:
-        db id -- invidiual uniq id of user
+        id -- invidiual unique id of user
+        nickname -- unique for each user
+        name
+        surname
+        education (optional)
+        linkedin (optional)
+        email (optional)
+        gender
+        phone (optional)
+        description (optional)
+        worker_id
+
     """
     id = Column(Integer, primary_key=True)
     nickname = Column(String(40), nullable=False, unique=True)
@@ -58,7 +69,11 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def avatar(self):
-        ex = [i for i in re.split("\W+", app.config['IMAGES']) if len(i)>1]
+        """
+        Returns:
+            str -- path to image file
+        """
+        ex = [i for i in app.config['IMAGES'].split() if len(i)>1]
         f_img = os.path.join('app', 'static', 'upload', 'avatar', 'avatar_' + str(self.id) + '.')
         img = os.path.join('..', 'static', 'upload', 'avatar', 'avatar_' + str(self.id)+'.')
         for extension in ex:
@@ -132,7 +147,9 @@ def load_user(id):
 class Post(db.Model):
     """post model database
     Arguments:
-        body and building object
+        body(str), author(id from User database), build_forum(id build from Build database-if post subject is build)
+        company_forum(id of company from Company model-if subject of post is company), timestamp(default=utcnow),
+        private_company(Boolean-True if post is only for company members)
     """
     id = Column(Integer, primary_key=True)
     body = Column(String(200), nullable=False)
@@ -149,7 +166,11 @@ class Post(db.Model):
 class Company(db.Model):
     """model database of building company
     Arguments:
-        contains all administrators and employees of company
+        name : str, description : str, web_page : string, verified : boolean,
+        workers:(list of employeers from Employee model)
+        build:(list of build from Build model)
+        posts:(list of posts from Post model)
+        jobapp:(list of job aplication from JobApp model)
     """
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False, unique=True)
@@ -188,6 +209,7 @@ employees = db.Table('employees',
 class Employee(db.Model):
     """Worker model
     Arguments:
+    user: user from User model,
     Position(str), salary(int), date_join(datetime)
     """
     __tablename__ = 'employee'
@@ -221,7 +243,9 @@ class Employee(db.Model):
 
 class Build(db.Model):
     """model database of builds
-    Object must belong to some company which is responsible for process of building
+    name:string, specification : string, category : string, worth : integer, place : string,
+    post_date : datetime, start_date : datetime, verified : boolean, creater : user_id(from User model),
+    contractor : build_id(from Build model), posts : contain all of posts belongs to this build(from Post model)
     """
     __tablename__ = 'build'
     id = Column(Integer, primary_key=True)
@@ -244,7 +268,12 @@ class Build(db.Model):
 
 class JobApp(db.Model):
     """
-    model for sending work offers or our application for job
+    sender : (int) id from Employee model
+    recipient : (int) id from User model
+    salary : (int) money in $
+    data_send : (datetime=time when we sending)
+    position : (str)
+    company_id : (int) id of company 
     """
     id = Column(Integer, primary_key=True)
     offer_sender = Column(Integer, ForeignKey('employee.id'))
@@ -260,3 +289,5 @@ admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Post, db.session))
 admin.add_view(ModelView(Build, db.session))
 admin.add_view(ModelView(Company, db.session))
+admin.add_view(ModelView(Employee, db.session))
+admin.add_view(ModelView(JobApp, db.session))

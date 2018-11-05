@@ -57,7 +57,7 @@
 
 
 
-{% if current_user.worker_id.firm == build.contractor %}
+{% if current_user.worker_id and current_user.worker_id.firm == build.contractor %}
 <div class="row">
 
 
