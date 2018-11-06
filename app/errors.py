@@ -13,4 +13,4 @@ def internal_error(error):
 
 
 
-print('hello there you pretty one!')
+print('hello there you pretty dude!')
