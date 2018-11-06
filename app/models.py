@@ -19,18 +19,21 @@ followers = db.Table('followers',
 class User(UserMixin, db.Model):
     """database for users in website
     Arguments:
-        id -- invidiual unique id of user
-        nickname -- unique for each user
-        name
-        surname
-        education (optional)
-        linkedin (optional)
-        email (optional)
-        gender
-        phone (optional)
-        description (optional)
-        worker_id
-
+        id : invidiual unique id of user
+        nickname : str unique for each user
+        name : str
+        surname : str
+        education :str (optional)
+        linkedin : str (optional)
+        email : str (optional)
+        gender : male/female
+        phone : int (optional)
+        description : str (optional)
+        admin : Boolean (default=False)
+        worker_id : int (id of Employee if user working in some Company)
+        creatures : int (id of Build that user create in database)
+        followed : int (connected with tabel)
+        job_recipient : int (id of Employee who sent to user job offer)
     """
     id = Column(Integer, primary_key=True)
     nickname = Column(String(40), nullable=False, unique=True)
@@ -149,7 +152,7 @@ class Post(db.Model):
     Arguments:
         body(str), author(id from User database), build_forum(id build from Build database-if post subject is build)
         company_forum(id of company from Company model-if subject of post is company), timestamp(default=utcnow),
-        private_company(Boolean-True if post is only for company members)
+        private_company(Boolean default=False, True if post is only for company members)
     """
     id = Column(Integer, primary_key=True)
     body = Column(String(200), nullable=False)
@@ -166,7 +169,10 @@ class Post(db.Model):
 class Company(db.Model):
     """model database of building company
     Arguments:
-        name : str, description : str, web_page : string, verified : boolean,
+        name : str,
+        description : str,
+        web_page : string,
+        verified : boolean,
         workers:(list of employeers from Employee model)
         build:(list of build from Build model)
         posts:(list of posts from Post model)
@@ -210,7 +216,9 @@ class Employee(db.Model):
     """Worker model
     Arguments:
     user: user from User model,
-    Position(str), salary(int), date_join(datetime)
+    Position(str),
+    salary(int),
+    date_join(datetime)
     """
     __tablename__ = 'employee'
     id = Column(Integer, primary_key=True)
