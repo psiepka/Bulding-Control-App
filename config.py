@@ -1,6 +1,10 @@
 import os
+# from dotenv import load_dotenv
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+# load_dotenv(basedir, '.flaskenv')
+
 
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -18,4 +22,5 @@ class Config(object):
     ALLOWED_EXTENSIONS = os.environ.get('ALLOWED_EXTENSIONS')
     ADMINS = os.environ.get('ADMINS')
     MAX_CONTENT_LENGHT = os.environ.get('MAX_CONTENT_LENGHT')
-    POST_PER_PAGE = int(os.environ.get('POST_PER_PAGE') or 25)
+    POST_PER_PAGE = int(os.environ.get('POST_PER_PAGE'))
+    ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')

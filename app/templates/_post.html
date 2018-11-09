@@ -1,23 +1,23 @@
 <table class="table table-bordered">
     <tr valign="center">
         <td width="70px" rowspan="2">
-            <a href="{{url_for('profile_user',nickname=post.author.nickname) }}">
+            <a href="{{url_for('main.profile_user',nickname=post.author.nickname) }}">
                 <img src="{{post.author.avatar() }}" alt="avatar {{ current_user.nickname}}" width="60" height="60">
             </a>
         </td>
         <td style="margin-top:10px">
-            <a href="{{url_for('profile_user',nickname=post.author.nickname) }}">
+            <a href="{{url_for('main.profile_user',nickname=post.author.nickname) }}">
                 {{post.author.name}} {{post.author.surname}} 
             </a>
             {{ moment(post.timestamp).fromNow() }}
             {% if post.company_forum %}
             in 
-            <a href="{{url_for('profile_company',company_id=post.company_forum.id)}}">
+            <a href="{{url_for('company.profile_company',company_id=post.company_forum.id)}}">
                 {{ post.company_forum.name }}
             </a>
             {% elif post.build_forum %}
             in 
-            <a href="{{ url_for('profile_build', build_id=post.build_forum.id) }}">
+            <a href="{{ url_for('build.profile_build', build_id=post.build_forum.id) }}">
                 {{ post.build_forum.name }}
             </a>
             {% endif %}

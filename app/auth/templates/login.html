@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+
+<h1 style="text-align:center">Sign in to BudApp </h1>
+<span class="border">
+    <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                {{ wtf.quick_form(form) }}
+            </div>
+        </div>
+</span>
+
+<p style="text-align:center">
+    <br>
+    Forgot Your Password?
+    <b><a class='link' href="{{ url_for('auth.reset_password_request') }}">Click to Reset It</a></b>
+</p>
+<hr>
+<p style="text-align:center">You dont have account yet? <a class='link' href="{{ url_for('auth.registration') }}"><b>Register in!</b></a></p>
+
+
+{% endblock %}

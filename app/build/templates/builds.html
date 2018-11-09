@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block app_content %}
+
+<h1>Builds </h1>
+{{ heading }}
+<br>
+{% if current_user.is_authenticated and current_user.worker_id and current_user.worker_id.admin   %}
+<a href="{{url_for('build.add_build')}}"><button type="button" class="btn btn-primary">Add build</button></a>
+{% endif %}
+<br>
+<table class="table table-hover">
+    {% for build in builds %}
+    <tr>
+        <td> <a href="{{ url_for('build.profile_build', build_id=build.id) }}"><b> {{ build.name }} </b></a> </td>
+        <td> {{ build.category }} </td>
+        <td>
+            {% if build.contractor %}
+                 by <b><a href="{{url_for('company.profile_company', company_id=build.contractor.id)}}"> {{ build.contractor.name }}</a></b>
+            {% endif %}
+        </td>
+        <td>
+            {% if current_user.is_authenticated and current_user.worker_id and current_user.worker_id.is_building(build) %}
+                <div class="attention">Your build</div>
+            {% endif %}
+        </td>
+        <td>
+            {% if build.contractor and current_user.worker_id and (build.contractor == current_user.worker_id.firm) %}
+                <a href="{{url_for('build.edit_build', build_id= build.id)}}"><button type="button" class="btn btn-link">Edit build</button></a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<nav aria-label="...">
+    <ul class="pager">
+        <li class="previous{% if not prev_url %} disabled{% endif %}">
+            <a href="{{ prev_url or '#' }}">
+                <span aria-hidden="true">&larr;</span> Newer posts
+            </a>
+        </li>
+        <li class="next{% if not next_url %} disabled{% endif %}">
+            <a href="{{ next_url or '#' }}">
+                Older posts <span aria-hidden="true">&rarr;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+{% endblock %}

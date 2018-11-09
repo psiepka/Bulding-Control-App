@@ -6,8 +6,51 @@ from sqlalchemy.types import Integer, String, Text, DateTime, Boolean, Date
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
-from flask_admin.contrib.sqla import ModelView
-from app import app, db, login_manager, admin
+from flask import current_app
+from app import db, login_manager
+from app.search import add_to_index, query_index, remove_from_index
+
+
+class SearchableMixin(object):
+    @classmethod
+    def search(cls, expression, page, per_page):
+        ids, total = query_index(cls.__tablename__, expression, page, per_page)
+        if total == 0:
+            return cls.query.filter_by(id=0), 0
+        when = []
+        for id in range(len(ids)):
+            when.append((ids[id], id))
+        return cls.query.filter(cls.id.in_(ids)).order_by(
+            db.case(when, value=cls.id)), total
+
+    @classmethod
+    def before_commit(cls, session):
+        session._changes = {
+            'add': list(session.new),
+            'update': list(session.dirty),
+            'delete': list(session.deleted)
+        }
+
+    @classmethod
+    def after_commit(cls, session):
+        for obj in session._changes['add']:
+            if isinstance(obj, SearchableMixin):
+                add_to_index(obj.__tablename__, obj)
+        for obj in session._changes['update']:
+            if isinstance(obj, SearchableMixin):
+                add_to_index(obj.__tablename__, obj)
+        for obj in session._changes['delete']:
+            if isinstance(obj, SearchableMixin):
+                remove_from_index(obj.__tablename__, obj)
+        session._changes = None
+
+    @classmethod
+    def reindex(cls):
+        for obj in cls.query:
+            add_to_index(cls.__tablename__, obj)
+
+db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
+db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
 
 
 followers = db.Table('followers',
@@ -76,7 +119,7 @@ class User(UserMixin, db.Model):
         Returns:
             str -- path to image file
         """
-        ex = [i for i in app.config['IMAGES'].split() if len(i)>1]
+        ex = [i for i in current_app.config['IMAGES'].split() if len(i)>1]
         f_img = os.path.join('app', 'static', 'upload', 'avatar', 'avatar_' + str(self.id) + '.')
         img = os.path.join('..', 'static', 'upload', 'avatar', 'avatar_' + str(self.id)+'.')
         for extension in ex:
@@ -88,7 +131,7 @@ class User(UserMixin, db.Model):
             return os.path.join('..','static', 'img','female.jpg')
 
     def curriculum_vitae(self):
-        ex = [i for i in re.split("\W+", app.config['ALLOWED_EXTENSIONS']) if len(i)>1]
+        ex = [i for i in re.split("\W+", current_app.config['ALLOWED_EXTENSIONS']) if len(i)>1]
         f_cv = os.path.join('app', 'static', 'upload', 'cv', 'cv_' + str(self.id))
         cv = os.path.join('..', 'static' , 'upload', 'cv', 'cv_' + str(self.id))
         for extension in ex:
@@ -130,12 +173,12 @@ class User(UserMixin, db.Model):
     def get_reset_password_token(self, expires_in=300):
         return jwt.encode(
             {'reset_password' : self.id, 'exp' : time() + expires_in},
-            app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+            current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
     @staticmethod
     def verify_reset_passwordd_token(token):
         try:
-            id = jwt.decode(token, app.config['SECRET_KEY'],
+            id = jwt.decode(token, current_app.config['SECRET_KEY'],
                             algorithms=['HS256'])['reset_password']
         except:
             return
@@ -147,13 +190,14 @@ def load_user(id):
     return User.query.get(int(id))
 
 
-class Post(db.Model):
+class Post(SearchableMixin, db.Model):
     """post model database
     Arguments:
         body(str), author(id from User database), build_forum(id build from Build database-if post subject is build)
         company_forum(id of company from Company model-if subject of post is company), timestamp(default=utcnow),
         private_company(Boolean default=False, True if post is only for company members)
     """
+    __searchable__ = ['body']
     id = Column(Integer, primary_key=True)
     body = Column(String(200), nullable=False)
     timestamp = Column(DateTime, index=True, default=datetime.utcnow)
@@ -291,11 +335,3 @@ class JobApp(db.Model):
     position = Column(String(100), nullable=False)
     company = Column(Integer, ForeignKey('company.id'))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-
-
-admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Post, db.session))
-admin.add_view(ModelView(Build, db.session))
-admin.add_view(ModelView(Company, db.session))
-admin.add_view(ModelView(Employee, db.session))
-admin.add_view(ModelView(JobApp, db.session))

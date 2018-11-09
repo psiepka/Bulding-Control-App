@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+
+
+{% block app_content %}
+
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <table class="table table-dark">
+            <tr class="t-center">
+                <th>Build Name:</th>
+                <th> {{build.name }} </th>
+            </tr>
+            <tr class="t-center">
+                <td>Specification : </td>
+                <td>{{ build.specification }}</td>
+            </tr>
+            <tr class="t-center">
+                <td>Category of build : </td>
+                <td>{{ build.category }}</td>
+            </tr>
+            <tr class="t-center">
+                <td>Build is worth : </td>
+                <td>{{ build.worth }} zł </td>
+            </tr>
+            <tr class="t-center">
+                <td>Localization of build : </td>
+                <td> {{ build.place }} </td>
+            </tr class="t-center">
+            {% if build.start_date %}
+            <tr class="t-center">
+                <td> Plannig start of build : </td>
+                <td> {{ build.start_date }} </td>
+            </tr>
+            {% endif %}
+            {% if build.end_date %}
+            <tr class="t-center">
+                <td> Plannig end of build : </td>
+                <td> {{ build.end_date }} </td>
+            </tr>
+            {% endif %}
+            <tr class="t-center">
+                <td> Created by : </td>
+                <td><a style="color:white" href="{{ url_for('main.profile_user', nickname=build.creater.nickname) }}">  <strong>{{build.creater.nickname}}</strong> </a></td>
+            </tr>
+            {% if build.contractor_id %}
+            <tr class="t-center">
+                <td> Contractor :</td>
+                <td> <a style="color:white" href="{{ url_for('company.profile_company',company_id=build.contractor.id) }}">{{ build.contractor.name }} </a></td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+</div>
+
+
+
+{% if current_user.worker_id and current_user.worker_id.firm == build.contractor %}
+<div class="row">
+
+
+    <div class="col-md shadow">
+        <p> Forum </p>
+        <p>
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#formAddPost1" aria-expanded="false">
+                Add post
+            </button>
+        </p>
+            <div class="collapse" id="formAddPost1">
+                <div class="row">
+                    <div class="col-xs-12">
+                        {{ wtf.quick_form(form1) }}
+                    </div>
+                </div>
+            </div>
+        {% for post in posts1 %}
+            {% include '_post.html' %}
+        {% endfor %}
+
+        <nav aria-label="...">
+            <ul class="pager">
+                <li class="previous{% if not prev_url %} disabled{% endif %}">
+                    <a href="{{ prev_url or '#' }}">
+                        <span aria-hidden="true">&larr;</span> Newer posts
+                    </a>
+                </li>
+                <li class="next{% if not next_url %} disabled{% endif %}">
+                    <a href="{{ next_url or '#' }}">
+                        Older posts <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+    </div>
+    <div class="col-md shadow">
+        <p> Forum of workers of build</p>
+        <p>
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#formAddPost2" aria-expanded="false">
+                Add post
+            </button>
+        </p>
+            <div class="collapse" id="formAddPost2">
+                <div class="row">
+                    <div class="col-xs-12">
+                        {{ wtf.quick_form(form2) }}
+                    </div>
+                </div>
+            </div>
+        {% for post in posts2 %}
+            {% include '_post.html' %}
+        {% endfor %}
+
+        <nav aria-label="...">
+                <ul class="pager">
+                    <li class="previous{% if not prev_url_c %} disabled{% endif %}">
+                        <a href="{{ prev_url_c or '#' }}">
+                            <span aria-hidden="true">&larr;</span> Newer posts
+                        </a>
+                    </li>
+                    <li class="next{% if not next_url_c %} disabled{% endif %}">
+                        <a href="{{ next_url_c or '#' }}">
+                            Older posts <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+
+    </div>
+</div>
+
+{% else %}
+
+    {% set form = form1 %}
+    {% include '_add_post.html' %}
+
+
+    {% for post in posts1 %}
+        {% include '_post.html' %}
+    {% endfor %}
+
+<nav aria-label="...">
+    <ul class="pager">
+        <li class="previous{% if not prev_url %} disabled{% endif %}">
+            <a href="{{ prev_url or '#' }}">
+                <span aria-hidden="true">&larr;</span> Newer posts
+            </a>
+        </li>
+        <li class="next{% if not next_url %} disabled{% endif %}">
+            <a href="{{ next_url or '#' }}">
+                Older posts <span aria-hidden="true">&rarr;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+
+{% endif %}
+
+
+
+
+{% endblock %}
