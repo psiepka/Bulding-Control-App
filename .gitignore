@@ -1,3 +1,4 @@
 .flaskenv
 *.db
 app/static/upload/*
+__pycache__
