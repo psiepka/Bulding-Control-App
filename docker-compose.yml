@@ -1,0 +1,82 @@
+version: '3'
+services:
+  web:
+    container_name: app
+    build: .
+    ports:
+     - "5000:5000"
+    environment:
+      SECRET_KEY: 4facd8c773
+      MAIL_SERVER: smtp.googlemail.com
+      MAIL_PORT: 587
+      MAIL_USE_TLS: 1
+      MAIL_USERNAME: budappps@gmail.com
+      MAIL_PASSWORD: apphaslo123
+      ALLOWED_EXTENSIONS: pdf
+      IMAGES: jpg
+      ADMINS: patrykeo001@gmail.com
+      MAX_CONTENT_LENGHT: 16*1024*1024
+      POST_PER_PAGE: 25
+    links:
+      - sql-database
+    environment:
+      DARABASE_URL: mysql+pymysql://patrickapp:haslo123@dbserver/patrickapp
+    links:
+      - elasticsearch
+      - elasticsearch2
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+  db:
+    container_name: sql-database
+    image: mysql/mysql-server:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      MYSQL_DATABASE: patrickapp
+      MYSQL_USER: patrickapp
+      MYSQL_PASSWORD: haslo123
+      DATABASE_URL: mysql+pymysql://patrickapp:haslo123@dbserver/patrickapp
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.1
+    container_name: elasticsearch
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - esnet
+  elasticsearch2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.1
+    container_name: elasticsearch2
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.zen.ping.unicast.hosts=elasticsearch"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata2:/usr/share/elasticsearch/data
+    networks:
+      - esnet
+
+volumes:
+  esdata1:
+    driver: local
+  esdata2:
+    driver: local
+
+networks:
+  esnet:
