@@ -2,3 +2,4 @@
 *.db
 app/static/upload/*
 __pycache__
+*.pyc

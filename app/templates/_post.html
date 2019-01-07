@@ -1,15 +1,12 @@
-<table class="table table-bordered">
-    <tr valign="center">
-        <td width="70px" rowspan="2">
-            <a href="{{url_for('main.profile_user',nickname=post.author.nickname) }}">
-                <img src="{{post.author.avatar() }}" alt="avatar {{ current_user.nickname}}" width="60" height="60">
-            </a>
-        </td>
-        <td style="margin-top:10px">
-            <a href="{{url_for('main.profile_user',nickname=post.author.nickname) }}">
-                {{post.author.name}} {{post.author.surname}} 
-            </a>
-            {{ moment(post.timestamp).fromNow() }}
+
+<article class="media content-section border">
+    <a href="{{url_for('main.profile_user',nickname=post.author.nickname) }}">
+        <img src="{{post.author.avatar() }}" alt="avatar {{ current_user.nickname}}" width="64" height="64">
+    </a>
+    <div class="media-body">
+    <div class="article-metadata">
+        <a class="mr-2" href="{{url_for('main.profile_user',nickname=post.author.nickname) }}">{{post.author.name}} {{post.author.surname}}</a>
+        <small class="text-muted">{{ moment(post.timestamp).fromNow() }}
             {% if post.company_forum %}
             in 
             <a href="{{url_for('company.profile_company',company_id=post.company_forum.id)}}">
@@ -22,11 +19,9 @@
             </a>
             {% endif %}
             :
-        </td>
-    </tr>
-    <tr>
-        <td>
-            {{post.body}}
-        </td>
-    </tr>
-</table>
+        </small>
+    </div>
+    <h2><a class="article-title" href="#">{{ post.title }}</a></h2>
+    <p class="article-content">{{ post.body }}</p>
+    </div>
+</article>
