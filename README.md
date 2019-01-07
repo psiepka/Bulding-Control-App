@@ -4,6 +4,7 @@ With this app we can easy control Building and in faster way store raports and d
 
 <hr>
 
+I used bootstrap for frontend in aplication and python framework Flask for backend.
 Check app progres on <a href='http://bulding-control-app.herokuapp.com/' target="_blank"> heroku </a>.
 
 
