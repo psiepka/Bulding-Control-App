@@ -11,5 +11,5 @@ Check app progres on <a href='http://bulding-control-app.herokuapp.com/' target=
 
 Database diagram
 
-<img src="app/static/img/preview_database.JPG" alt="diagram db">
+<img src="app/static/img/preview_db.JPG" alt="diagram db">
 
