@@ -10,7 +10,7 @@ Check app progres on <a href='http://bulding-control-app.herokuapp.com/' target=
 
 <hr>
 
-Database diagram
+Database diagram build in SQL:
 
 <img src="app/static/img/preview_db.JPG" alt="diagram db">
 
